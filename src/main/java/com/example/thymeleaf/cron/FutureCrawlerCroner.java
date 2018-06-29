@@ -5,8 +5,8 @@ import com.example.thymeleaf.model.FutureCrawler;
 import com.example.thymeleaf.service.ApplicationContextProvider;
 import com.example.thymeleaf.service.FutureCrawlerService;
 import com.example.thymeleaf.service.SeedsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Component
 public class FutureCrawlerCroner {
-    private static Logger logger = LoggerFactory.getLogger(FutureCrawlerCroner.class);
+    private static Log logger = LogFactory.getLog("timeLog");
 
     @Autowired
     private FutureCrawlerService futureCrawlerService;

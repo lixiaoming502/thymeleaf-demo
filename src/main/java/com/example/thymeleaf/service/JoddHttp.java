@@ -1,9 +1,16 @@
 package com.example.thymeleaf.service;
 
+import com.example.thymeleaf.util.AppUtils;
+import jodd.http.HttpBrowser;
 import jodd.http.HttpRequest;
 import jodd.http.HttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -11,6 +18,8 @@ import java.util.Random;
  */
 @Service
 public class JoddHttp {
+
+    private static Logger logger = LoggerFactory.getLogger(JoddHttp.class);
 
     final  static String[] USER_AGENTS = {
         "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; AcooBrowser; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
@@ -32,10 +41,37 @@ public class JoddHttp {
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36"
     };
 
-    public HttpResponse send(String url){
+    private Map<String,HttpBrowser> browsers = new HashMap<String,HttpBrowser>();
+
+    public HttpResponse send(String url,String refer){
         HttpRequest httpRequest = HttpRequest.get(url);
         httpRequest.header("User-Agent",randomUA());
+        httpRequest.header("referer",refer);
+        httpRequest.header("cookie","Hm_lvt_5eb81c3b57ea700d51556a83f9cebcfe=1529906198; PHPSESSID=vafq33vir6fs9h49ka803j6eh6; fikker-QxUb-iPW6=ihM43lWfiX7VCM70LDadQVyTSdePAFQI; fikker-QxUb-iPW6=ihM43lWfiX7VCM70LDadQVyTSdePAFQI; fikker-G63t-NHOI=SJAbMdehiJUDWfKFJ8sRwBkpc4QR5d3b; fikker-G63t-NHOI=SJAbMdehiJUDWfKFJ8sRwBkpc4QR5d3b; fikker-EvqM-cpAV=cB3KyFSvmrcdSRIR7HwIKTNRU63lC0cP; fikker-EvqM-cpAV=cB3KyFSvmrcdSRIR7HwIKTNRU63lC0cP; fikker-cdgH-UTIt=iRQ6QXipabJJUH7OsT1dwTQjqrirW6OK; Hm_lpvt_5eb81c3b57ea700d51556a83f9cebcfe=1530238589");
         HttpResponse response = httpRequest.send();
+        //String cookie = response.header("Cookie");
+        //System.out.println("cookie:"+cookie);
+        return response;
+    }
+
+    public HttpResponse sendBrowser(String url,String refer) {
+        String domainName = null;
+        try {
+            domainName = AppUtils.extraDomain(url);
+        } catch (MalformedURLException e) {
+            logger.warn("",e);
+            return null;
+        }
+        HttpBrowser browser = browsers.get(domainName);
+        if(browser==null){
+            browser = new HttpBrowser();
+            browsers.put(domainName,browser);
+        }
+        HttpRequest request = HttpRequest.get(url);
+        request.header("User-Agent",randomUA());
+        request.header("referer",refer);
+        browser.sendRequest(request);
+        HttpResponse response = browser.getHttpResponse();
         return response;
     }
 
@@ -44,5 +80,14 @@ public class JoddHttp {
         Random random = new Random();
         int idx = random.nextInt(length);
         return USER_AGENTS[idx];
+    }
+
+    public static void main(String[] args) throws MalformedURLException {
+        JoddHttp joddHttp = new JoddHttp();
+        String url = "https://m.xiaoshuoli.com/ph/week_1.html";
+        HttpResponse response = joddHttp.sendBrowser(url, url);
+        joddHttp.sendBrowser(url, url);
+        System.out.println(response);
+
     }
 }

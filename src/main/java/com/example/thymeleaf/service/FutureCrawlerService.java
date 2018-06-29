@@ -3,6 +3,7 @@ package com.example.thymeleaf.service;
 import com.example.thymeleaf.dao.FutureCrawlerMapper;
 import com.example.thymeleaf.model.FutureCrawler;
 import com.example.thymeleaf.model.FutureCrawlerExample;
+import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -23,6 +24,10 @@ public class FutureCrawlerService {
     private FutureCrawlerMapper futureCrawlerMapper ;
 
     public List<FutureCrawler> getToBeCrawl(){
+        //使用分页插件,核心代码就这一行
+        int pageNum = 1;
+        int pageSize = 10;
+        PageHelper.startPage(pageNum, pageSize);
         FutureCrawlerExample example = new FutureCrawlerExample();
         FutureCrawlerExample.Criteria criteria = example.createCriteria();
         criteria.andCrawlerStateNotEqualTo("F");

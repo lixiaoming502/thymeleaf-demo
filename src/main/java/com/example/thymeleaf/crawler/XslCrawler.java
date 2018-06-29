@@ -2,16 +2,13 @@ package com.example.thymeleaf.crawler;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.example.thymeleaf.selfdrive.DefaultSelfDriver;
 import com.example.thymeleaf.selfdrive.DriverFuture;
-import com.example.thymeleaf.service.FutureCrawlerService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -20,17 +17,9 @@ import java.io.IOException;
  * Created by lixiaoming on 2018/6/27.
  */
 @Component
-public class XslCrawler implements Crawler{
+public class XslCrawler extends AbstractCrawler{
 
     private static Logger logger = LoggerFactory.getLogger(XslCrawler.class);
-
-    @Autowired
-    private DefaultSelfDriver selfDriver;
-
-    @Autowired
-    private FutureCrawlerService futureCrawlerService;
-
-    private String domain = "m.xiaoshuoli.com";
 
     private String baseUrl = "https://m.xiaoshuoli.com/";
 
@@ -101,16 +90,6 @@ public class XslCrawler implements Crawler{
             title = title.substring(0,3);
         }
         return title;
-    }
-
-    private DriverFuture createDriverFuture(int crawlerId, String url) {
-        DriverFuture future = new DriverFuture(crawlerId,url);
-        selfDriver.fetch(future);
-        return future;
-    }
-
-    public String getDomain(){
-        return domain;
     }
 
     public boolean parseLevel2(int crawlerId,String url){

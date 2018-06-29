@@ -7,6 +7,7 @@ import com.example.thymeleaf.model.FutureCrawlerCfgExample;
 import com.example.thymeleaf.model.FuturePageLoader;
 import com.example.thymeleaf.model.FuturePageLoaderExample;
 import com.example.thymeleaf.util.AppUtils;
+import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -30,6 +31,10 @@ public class FuturePageLoaderService {
     private FutureCrawlerCfgMapper futureCrawlerCfgMapper;
 
     public List<FuturePageLoader> getToBeLoaded() {
+        //使用分页插件,核心代码就这一行
+        int pageNum = 1;
+        int pageSize = 10;
+        PageHelper.startPage(pageNum, pageSize);
         FuturePageLoaderExample example = new FuturePageLoaderExample();
         FuturePageLoaderExample.Criteria criteria = example.createCriteria();
         criteria.andLoaderStateEqualTo("A");
@@ -68,6 +73,10 @@ public class FuturePageLoaderService {
     }
 
     public List<FuturePageLoader> getToBeCrawler() {
+        //使用分页插件,核心代码就这一行
+        int pageNum = 1;
+        int pageSize = 10;
+        PageHelper.startPage(pageNum, pageSize);
         FuturePageLoaderExample example = new FuturePageLoaderExample();
         FuturePageLoaderExample.Criteria criteria = example.createCriteria();
         criteria.andPlanTimeLessThanOrEqualTo(new Date());
@@ -110,6 +119,15 @@ public class FuturePageLoaderService {
         futurePageLoader.setUpdateTime(createTime);
 
         futurePageLoaderMapper.insert(futurePageLoader);
+    }
+
+    public void updatePlanTime(FuturePageLoader record) {
+        Date now = new Date();
+        int gap = 30;
+        Date next  = AppUtils.addSecond(gap,now);
+        record.setPlanTime(next);
+        record.setUpdateTime(now);
+        futurePageLoaderMapper.updateByPrimaryKeySelective(record);
     }
 }
 
