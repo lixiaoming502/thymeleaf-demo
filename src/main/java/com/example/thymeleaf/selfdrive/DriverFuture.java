@@ -5,15 +5,17 @@ package com.example.thymeleaf.selfdrive;
  */
 public class DriverFuture {
 
+    private final Integer domainId;
     private int crawlerId;
 
     private String pageUrl;
 
     private Object respone;
 
-    public DriverFuture(int crawlerId, String url) {
+    public DriverFuture(int crawlerId, Integer domainId, String url) {
         this.crawlerId = crawlerId;
         this.pageUrl = url;
+        this.domainId = domainId;
     }
 
     public int getCrawlerId() {
@@ -22,6 +24,10 @@ public class DriverFuture {
 
     public String getPageUrl() {
         return pageUrl;
+    }
+
+    public Integer getDomainId() {
+        return domainId;
     }
 
     public Object getRespone() {

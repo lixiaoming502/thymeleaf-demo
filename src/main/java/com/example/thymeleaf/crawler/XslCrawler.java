@@ -23,7 +23,8 @@ public class XslCrawler extends AbstractCrawler{
 
     private String baseUrl = "https://m.xiaoshuoli.com/";
 
-    public boolean parse(int level,int crawlerId,String url){
+    public boolean parse(int level, int crawlerId, Integer domainId, String url){
+        this.domainId = domainId;
         switch (level){
             case 1:
                 return praseLevel1(crawlerId,url);
@@ -34,6 +35,9 @@ public class XslCrawler extends AbstractCrawler{
     }
 
     public boolean praseLevel1(int crawlerId,String url){
+        if(hasCrawlerPageWaiting(crawlerId)){
+            return false;
+        }
         DriverFuture future = createDriverFuture(crawlerId, url);
         if(future.isDone()) {
             String respone = (String)future.getRespone();
@@ -75,8 +79,8 @@ public class XslCrawler extends AbstractCrawler{
         String chpUrl = doc.select("div.list_1 a").get(0).attr("href");
         String img = doc.select(".synopsisArea_detail img").get(0).attr("src");
         String title = doc.select("h1.title").get(0).text();
-        title = correct(title);
         String author = doc.select("p.author").get(0).text();
+        //author = correct(author);
         JSONObject cpo = new JSONObject();
         cpo.put("chpUrl",baseUrl+chpUrl);
         cpo.put("img",img);

@@ -4,6 +4,7 @@ import com.example.thymeleaf.dao.FutureCrawlerMapper;
 import com.example.thymeleaf.model.FutureCrawler;
 import com.example.thymeleaf.model.FutureCrawlerExample;
 import com.github.pagehelper.PageHelper;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -23,6 +24,7 @@ public class FutureCrawlerService {
     @Autowired
     private FutureCrawlerMapper futureCrawlerMapper ;
 
+    @Deprecated
     public List<FutureCrawler> getToBeCrawl(){
         //使用分页插件,核心代码就这一行
         int pageNum = 1;
@@ -31,6 +33,7 @@ public class FutureCrawlerService {
         FutureCrawlerExample example = new FutureCrawlerExample();
         FutureCrawlerExample.Criteria criteria = example.createCriteria();
         criteria.andCrawlerStateNotEqualTo("F");
+        //example.setOrderByClause("domain_id,id");
         return futureCrawlerMapper.selectByExample(example);
     }
 
@@ -52,5 +55,22 @@ public class FutureCrawlerService {
         output.write(response);
         output.close();
 
+    }
+
+    public FutureCrawler getToBeCrawlByDomainId(int domainId) {
+        int pageNum = 1;
+        int pageSize = 1;
+        PageHelper.startPage(pageNum, pageSize);
+        FutureCrawlerExample example = new FutureCrawlerExample();
+        FutureCrawlerExample.Criteria criteria = example.createCriteria();
+        criteria.andCrawlerStateNotEqualTo("F");
+        criteria.andDomainIdEqualTo(domainId);
+        example.setOrderByClause("id");
+        List<FutureCrawler> lst = futureCrawlerMapper.selectByExample(example);
+        if(CollectionUtils.isEmpty(lst)){
+            return null;
+        }else{
+            return lst.get(0);
+        }
     }
 }

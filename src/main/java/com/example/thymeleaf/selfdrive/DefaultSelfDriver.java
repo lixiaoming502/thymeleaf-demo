@@ -32,7 +32,7 @@ public class DefaultSelfDriver implements SelfDriver {
                 driverFuture.getPageUrl());
         if(CollectionUtils.isEmpty(lst)){
             //新增
-            futurePageLoaderService.addRecord(driverFuture.getCrawlerId(),driverFuture.getPageUrl());
+            futurePageLoaderService.addRecord(driverFuture.getCrawlerId(),driverFuture.getPageUrl(),driverFuture.getDomainId());
         }else{
             //判断状态
             FuturePageLoader futurePageLoader = lst.get(0);

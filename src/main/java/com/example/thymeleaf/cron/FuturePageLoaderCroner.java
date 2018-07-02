@@ -1,6 +1,8 @@
 package com.example.thymeleaf.cron;
 
+import com.example.thymeleaf.model.FutureCrawlerCfg;
 import com.example.thymeleaf.model.FuturePageLoader;
+import com.example.thymeleaf.service.FutureCrawlerCfgService;
 import com.example.thymeleaf.service.FuturePageLoaderService;
 import com.example.thymeleaf.service.JoddHttp;
 import com.example.thymeleaf.util.AppUtils;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -20,7 +23,7 @@ import java.util.List;
 @Component
 public class FuturePageLoaderCroner {
 
-    private static Log logger = LogFactory.getLog("timeLog");
+    private static Log logger = LogFactory.getLog(FuturePageLoaderCroner.class);
 
     @Autowired
     private FuturePageLoaderService futurePageLoaderService;
@@ -28,20 +31,30 @@ public class FuturePageLoaderCroner {
     @Autowired
     private JoddHttp joddHttp;
 
-    @Scheduled(fixedRate = 1000)
+    @Autowired
+    private FutureCrawlerCfgService futureCrawlerCfgService;
+
+    @Scheduled(fixedDelay = 1000)
     public void work(){
         logger.info("FuturePageLoaderCroner begin");
-        List<FuturePageLoader> toBeLoaded = futurePageLoaderService.getToBeLoaded();
-        //状态由A->P
-        for(FuturePageLoader futurePageLoader:toBeLoaded){
-            loadPage(futurePageLoader);
-        }
-        List<FuturePageLoader> toBeCrawler = futurePageLoaderService.getToBeCrawler();
-        for(FuturePageLoader futurePageLoader:toBeCrawler){
-            crawl(futurePageLoader);
+        //1.找到不同的domain_id
+        List<FutureCrawlerCfg> lst = futureCrawlerCfgService.getAll();
+        //2.对于每个domain_id,找到第一个最小记录，执行爬取
+        for(FutureCrawlerCfg futureCrawlerCfg:lst){
+            FuturePageLoader futurePageLoader = futurePageLoaderService.getToBeCrawlByDomainId(futureCrawlerCfg.getId());
+            if(futurePageLoader!=null){
+                Date last = futureCrawlerCfg.getLastCrawlTime();
+                Integer gap = futureCrawlerCfg.getGap();
+                Date next  = AppUtils.addSecond(gap,last);
+                Date now = new Date();
+                if(next.before(now)){
+                    futureCrawlerCfg.setLastCrawlTime(now);
+                    futureCrawlerCfgService.update(futureCrawlerCfg);
+                    crawl(futurePageLoader);
+                }
+            }
         }
         logger.info("FuturePageLoaderCroner end");
-
     }
 
     private void crawl(FuturePageLoader futurePageLoader) {

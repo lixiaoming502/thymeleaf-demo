@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
-
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ThymeleafDemoApplicationTests {
@@ -41,8 +39,8 @@ public class ThymeleafDemoApplicationTests {
 
 	@Test
 	public void test_futureCrawlerService(){
-		List<FutureCrawler> lst = futureCrawlerService.getToBeCrawl();
-		System.out.println(lst);
+		FutureCrawler ff = futureCrawlerService.getToBeCrawlByDomainId(1);
+		System.out.println(ff);
 	}
 
 }

@@ -8,6 +8,7 @@ import com.example.thymeleaf.model.FuturePageLoader;
 import com.example.thymeleaf.model.FuturePageLoaderExample;
 import com.example.thymeleaf.util.AppUtils;
 import com.github.pagehelper.PageHelper;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -109,7 +110,7 @@ public class FuturePageLoaderService {
         return futurePageLoaderMapper.selectByExample(example);
     }
 
-    public void addRecord(int crawlerId, String pageUrl) {
+    public void addRecord(int crawlerId, String pageUrl, Integer domainId) {
         FuturePageLoader futurePageLoader = new FuturePageLoader();
         futurePageLoader.setLoaderState("A");
         futurePageLoader.setCrawlerId(crawlerId);
@@ -117,6 +118,7 @@ public class FuturePageLoaderService {
         final Date createTime = new Date();
         futurePageLoader.setCreateTime(createTime);
         futurePageLoader.setUpdateTime(createTime);
+        futurePageLoader.setDomainId(domainId);
 
         futurePageLoaderMapper.insert(futurePageLoader);
     }
@@ -128,6 +130,32 @@ public class FuturePageLoaderService {
         record.setPlanTime(next);
         record.setUpdateTime(now);
         futurePageLoaderMapper.updateByPrimaryKeySelective(record);
+    }
+
+    public boolean isCrawlerPageWaiting(int crawlerId){
+        FuturePageLoaderExample example = new FuturePageLoaderExample();
+        FuturePageLoaderExample.Criteria criteria = example.createCriteria();
+        criteria.andCrawlerIdEqualTo(crawlerId);
+        criteria.andLoaderStateNotEqualTo("F");
+        List<FuturePageLoader> lst = futurePageLoaderMapper.selectByExample(example);
+        return CollectionUtils.isNotEmpty(lst);
+    }
+
+    public FuturePageLoader getToBeCrawlByDomainId(Integer domainId) {
+        int pageNum = 1;
+        int pageSize = 1;
+        PageHelper.startPage(pageNum, pageSize);
+        FuturePageLoaderExample example = new FuturePageLoaderExample();
+        FuturePageLoaderExample.Criteria criteria = example.createCriteria();
+        criteria.andDomainIdEqualTo(domainId);
+        criteria.andLoaderStateNotEqualTo("F");
+        example.setOrderByClause("id");
+        List<FuturePageLoader> lst = futurePageLoaderMapper.selectByExample(example);
+        if(CollectionUtils.isEmpty(lst)){
+            return null;
+        }else{
+            return lst.get(0);
+        }
     }
 }
 
