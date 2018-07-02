@@ -123,15 +123,6 @@ public class FuturePageLoaderService {
         futurePageLoaderMapper.insert(futurePageLoader);
     }
 
-    public void updatePlanTime(FuturePageLoader record) {
-        Date now = new Date();
-        int gap = 30;
-        Date next  = AppUtils.addSecond(gap,now);
-        record.setPlanTime(next);
-        record.setUpdateTime(now);
-        futurePageLoaderMapper.updateByPrimaryKeySelective(record);
-    }
-
     public boolean isCrawlerPageWaiting(int crawlerId){
         FuturePageLoaderExample example = new FuturePageLoaderExample();
         FuturePageLoaderExample.Criteria criteria = example.createCriteria();
@@ -149,7 +140,7 @@ public class FuturePageLoaderService {
         FuturePageLoaderExample.Criteria criteria = example.createCriteria();
         criteria.andDomainIdEqualTo(domainId);
         criteria.andLoaderStateNotEqualTo("F");
-        example.setOrderByClause("id");
+        example.setOrderByClause("crawler_id,id");
         List<FuturePageLoader> lst = futurePageLoaderMapper.selectByExample(example);
         if(CollectionUtils.isEmpty(lst)){
             return null;

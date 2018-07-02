@@ -12,10 +12,20 @@ public class DriverFuture {
 
     private Object respone;
 
+    private int statusCode;
+
     public DriverFuture(int crawlerId, Integer domainId, String url) {
         this.crawlerId = crawlerId;
         this.pageUrl = url;
         this.domainId = domainId;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
     }
 
     public int getCrawlerId() {

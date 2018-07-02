@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -42,13 +43,13 @@ public class FutureCrawlerService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor=Exception.class)
-    public void finish(int crawlerId, String response) throws IOException {
+    public void finish(int crawlerId, String crawlerState, String response) throws IOException {
         FutureCrawler futureCrawler = new FutureCrawler();
         futureCrawler.setId(crawlerId);
         futureCrawler.setUpdateTime(new Date());
         final String fileName = "data/crawler_" + crawlerId + ".txt";
         futureCrawler.setResponse(fileName);
-        futureCrawler.setCrawlerState("F");
+        futureCrawler.setCrawlerState(crawlerState);
         futureCrawlerMapper.updateByPrimaryKeySelective(futureCrawler);
 
         FileWriter output = new FileWriter(fileName);
@@ -63,7 +64,10 @@ public class FutureCrawlerService {
         PageHelper.startPage(pageNum, pageSize);
         FutureCrawlerExample example = new FutureCrawlerExample();
         FutureCrawlerExample.Criteria criteria = example.createCriteria();
-        criteria.andCrawlerStateNotEqualTo("F");
+        List<String> stateLst = new ArrayList<>();
+        stateLst.add("E");
+        stateLst.add("F");
+        criteria.andCrawlerStateNotIn(stateLst);
         criteria.andDomainIdEqualTo(domainId);
         example.setOrderByClause("id");
         List<FutureCrawler> lst = futureCrawlerMapper.selectByExample(example);

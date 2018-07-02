@@ -62,10 +62,7 @@ public class FuturePageLoaderCroner {
         HttpResponse response = joddHttp.sendBrowser(futurePageLoader.getPageUrl(),futurePageLoader.getPageUrl());
         int statusCode = response.statusCode();
         if(statusCode!=200){
-            logger.info("get statusCode "+statusCode);
-            logger.info("updatePlanTime id = "+futurePageLoader.getId());
-            futurePageLoaderService.updatePlanTime(futurePageLoader);
-            return;
+            logger.warn("get statusCode "+statusCode);
         }
         //更新状态，写文件，如果写文件异常则回滚
         try {

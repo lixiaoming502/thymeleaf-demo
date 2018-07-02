@@ -45,6 +45,7 @@ public class DefaultSelfDriver implements SelfDriver {
                     logger.warn("",e);
                 }
                 driverFuture.setRespone(content);
+                driverFuture.setStatusCode(futurePageLoader.getStateCode());
             }
         }
         return driverFuture;

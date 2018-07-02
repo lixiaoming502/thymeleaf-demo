@@ -44,6 +44,7 @@ public class XslCrawler extends AbstractCrawler{
             Document doc = Jsoup.parse(respone);
             Elements items = doc.select("div#main div.hot_sale");
             JSONArray jsonArray = new JSONArray();
+            String crawlerState = "F";
             for(Element item:items){
                 Element infoUrlE = item.select("a").get(0);
                 String infoUrl  = infoUrlE.attr("href");
@@ -51,16 +52,21 @@ public class XslCrawler extends AbstractCrawler{
                 String pageUrl = baseUrl+infoUrl;
                 future = createDriverFuture(crawlerId,pageUrl);
                 if(future.isDone()){
-                    JSONObject cpo = parseInfo(future);
-                    logger.info("get cpo:"+cpo.toJSONString());
-                    jsonArray.add(cpo);
+                    if( future.getStatusCode()==200){
+                        JSONObject cpo = parseInfo(future);
+                        logger.info("get cpo:"+cpo.toJSONString());
+                        jsonArray.add(cpo);
+                    }else{
+                        logger.warn("set crawlerState E ,crawlerId:"+crawlerId);
+                        crawlerState = "E";
+                    }
                 }
             }
             if(jsonArray.size()!=items.size()){
                 return false;
             }
             try {
-                futureCrawlerService.finish(crawlerId,jsonArray.toJSONString());
+                futureCrawlerService.finish(crawlerId,crawlerState,jsonArray.toJSONString());
             } catch (IOException e) {
                 logger.warn("",e);
                 return false;
@@ -80,12 +86,16 @@ public class XslCrawler extends AbstractCrawler{
         String img = doc.select(".synopsisArea_detail img").get(0).attr("src");
         String title = doc.select("h1.title").get(0).text();
         String author = doc.select("p.author").get(0).text();
+        String sort = doc.select("p.sort").get(0).text();
+        String review = doc.select("p.review").get(0).text();
         //author = correct(author);
         JSONObject cpo = new JSONObject();
         cpo.put("chpUrl",baseUrl+chpUrl);
         cpo.put("img",img);
         cpo.put("title",title);
         cpo.put("author",author);
+        cpo.put("sort",sort);
+        cpo.put("review",review);
         return cpo;
     }
 
