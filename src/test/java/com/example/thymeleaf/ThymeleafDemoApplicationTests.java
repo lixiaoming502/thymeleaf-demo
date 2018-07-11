@@ -2,7 +2,9 @@ package com.example.thymeleaf;
 
 import com.example.thymeleaf.cron.FutureCrawlerCroner;
 import com.example.thymeleaf.cron.FuturePageLoaderCroner;
+import com.example.thymeleaf.cron.PanCroner;
 import com.example.thymeleaf.model.FutureCrawler;
+import com.example.thymeleaf.service.FixInvalidArticle;
 import com.example.thymeleaf.service.FutureCrawlerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +25,12 @@ public class ThymeleafDemoApplicationTests {
 	@Autowired
 	private FutureCrawlerService futureCrawlerService;
 
+	@Autowired
+	private PanCroner panCroner;
+
+	@Autowired
+	private FixInvalidArticle fixInvalidArticle;
+
 	@Test
 	public void contextLoads() {
 	}
@@ -41,6 +49,16 @@ public class ThymeleafDemoApplicationTests {
 	public void test_futureCrawlerService(){
 		FutureCrawler ff = futureCrawlerService.getToBeCrawlByDomainId(1);
 		System.out.println(ff);
+	}
+
+	@Test
+	public void test_Panconer(){
+		panCroner.work();
+	}
+
+	@Test
+	public void test_fixInvalidArticle() throws Exception {
+		fixInvalidArticle.work();
 	}
 
 }

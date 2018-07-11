@@ -9,7 +9,8 @@ import jodd.util.Base64;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 /**
  * Created by lixiaoming on 2018/6/28.
@@ -46,7 +47,7 @@ public class T1 {
         System.out.println(url);
         JoddHttp joddHttp = new JoddHttp();
         HttpResponse response = joddHttp.sendBrowser(url, url);
-        Map<String, String[]> headers = response.headers();
+        //Map<String, String[]> headers = response.headers();
         //String s2 = new String(response.bodyBytes(), "gbk");
         String s1 = response.contentType();
         System.out.println("response.charset():"+response.charset());
@@ -68,11 +69,21 @@ public class T1 {
         fileWriter.close();
     }
 
+    private void t2() throws UnsupportedEncodingException {
+        String title ="我的漂亮女同事（女总裁的非常保镖）";
+        System.out.println(URLEncoder.encode(title,"UTF-8"));
+        String d1 = "%E6%88%91%E7%9A%84%E6%BC%82%E4%BA%AE%E5%A5%B3%E5%90%8C%E4%BA%8B%EF%BC%88%E5%A5%B3%E6%80%BB";
+        System.out.println(URLDecoder.decode(d1));
+    }
+
+
+
     public static void main(String[] args) throws IOException {
         T1 t1 = new T1();
         //t1.testBrowser();
         //t1.testDecodeBase64();
-        t1.genSql();
+        //t1.genSql();
+        t1.t2();
 
     }
 }

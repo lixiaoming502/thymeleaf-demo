@@ -23,17 +23,6 @@ public class XslCrawler extends AbstractCrawler{
 
     private String baseUrl = "https://m.xiaoshuoli.com/";
 
-    public boolean parse(int level, int crawlerId, Integer domainId, String url){
-        this.domainId = domainId;
-        switch (level){
-            case 1:
-                return praseLevel1(crawlerId,url);
-            case 2:
-                return parseLevel2(crawlerId,url);
-        }
-        return false;
-    }
-
     public boolean praseLevel1(int crawlerId,String url){
         if(hasCrawlerPageWaiting(crawlerId)){
             return false;
@@ -45,6 +34,7 @@ public class XslCrawler extends AbstractCrawler{
             Elements items = doc.select("div#main div.hot_sale");
             JSONArray jsonArray = new JSONArray();
             String crawlerState = "F";
+            int error = 0;
             for(Element item:items){
                 Element infoUrlE = item.select("a").get(0);
                 String infoUrl  = infoUrlE.attr("href");
@@ -59,10 +49,11 @@ public class XslCrawler extends AbstractCrawler{
                     }else{
                         logger.warn("set crawlerState E ,crawlerId:"+crawlerId);
                         crawlerState = "E";
+                        ++error;
                     }
                 }
             }
-            if(jsonArray.size()!=items.size()){
+            if(jsonArray.size()+error!=items.size()){
                 return false;
             }
             try {

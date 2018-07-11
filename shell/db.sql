@@ -11,6 +11,7 @@ CREATE TABLE `t_seeds` (
 CREATE TABLE `t_future_crawler` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `seed_id` int(100) NOT NULL,
+  `domain_id` int(11) DEFAULT NULL,
   `level` int(100) NOT NULL,
   `page_url` varchar(100) NOT NULL DEFAULT '',
   `response` varchar(100) DEFAULT NULL,
@@ -18,7 +19,7 @@ CREATE TABLE `t_future_crawler` (
   `create_time` timestamp NULL DEFAULT NULL,
   `update_time` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5101 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `t_future_crawler_cfg` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -26,18 +27,20 @@ CREATE TABLE `t_future_crawler_cfg` (
   `gap` int(3) NOT NULL DEFAULT '3' COMMENT '单位：秒',
   `last_crawl_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `t_future_page_loader` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `crawler_id` int(11) NOT NULL,
+  `domain_id` int(11) DEFAULT NULL,
   `page_url` varchar(100) DEFAULT NULL,
   `response` varchar(100) DEFAULT NULL,
   `state_code` int(11) DEFAULT NULL,
   `loader_state` char(1) DEFAULT NULL,
+  `paned` char(1) DEFAULT NULL,
   `create_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `update_time` timestamp NULL DEFAULT NULL,
   `plan_time` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `crawler_id` (`crawler_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=56137 DEFAULT CHARSET=utf8;

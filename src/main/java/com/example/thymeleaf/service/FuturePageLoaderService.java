@@ -42,6 +42,25 @@ public class FuturePageLoaderService {
         return futurePageLoaderMapper.selectByExample(example);
     }
 
+    public List<FuturePageLoader> getUnPaned() {
+        //使用分页插件,核心代码就这一行
+        int pageNum = 1;
+        int pageSize = 10;
+        PageHelper.startPage(pageNum, pageSize);
+        FuturePageLoaderExample example = new FuturePageLoaderExample();
+        FuturePageLoaderExample.Criteria criteria = example.createCriteria();
+        criteria.andLoaderStateEqualTo("F");
+        criteria.andPanedIsNull();
+        criteria.andStateCodeEqualTo(200);
+
+        return futurePageLoaderMapper.selectByExample(example);
+    }
+
+    public void update(FuturePageLoader futurePageLoader){
+        futurePageLoaderMapper.updateByPrimaryKeySelective(futurePageLoader);
+    }
+
+
     /**
      * 获取下次爬取时间=上次爬取时间+间隔
      * 更新下次爬取时间，更新爬取状态

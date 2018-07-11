@@ -47,10 +47,9 @@ public class JoddHttp {
         HttpRequest httpRequest = HttpRequest.get(url);
         httpRequest.header("User-Agent",randomUA());
         httpRequest.header("referer",refer);
-        httpRequest.header("cookie","Hm_lvt_5eb81c3b57ea700d51556a83f9cebcfe=1529906198; PHPSESSID=vafq33vir6fs9h49ka803j6eh6; fikker-QxUb-iPW6=ihM43lWfiX7VCM70LDadQVyTSdePAFQI; fikker-QxUb-iPW6=ihM43lWfiX7VCM70LDadQVyTSdePAFQI; fikker-G63t-NHOI=SJAbMdehiJUDWfKFJ8sRwBkpc4QR5d3b; fikker-G63t-NHOI=SJAbMdehiJUDWfKFJ8sRwBkpc4QR5d3b; fikker-EvqM-cpAV=cB3KyFSvmrcdSRIR7HwIKTNRU63lC0cP; fikker-EvqM-cpAV=cB3KyFSvmrcdSRIR7HwIKTNRU63lC0cP; fikker-cdgH-UTIt=iRQ6QXipabJJUH7OsT1dwTQjqrirW6OK; Hm_lpvt_5eb81c3b57ea700d51556a83f9cebcfe=1530238589");
+        httpRequest.followRedirects(false);
+        //httpRequest.header("cookie","Hm_lvt_5eb81c3b57ea700d51556a83f9cebcfe=1529906198; PHPSESSID=vafq33vir6fs9h49ka803j6eh6; fikker-QxUb-iPW6=ihM43lWfiX7VCM70LDadQVyTSdePAFQI; fikker-QxUb-iPW6=ihM43lWfiX7VCM70LDadQVyTSdePAFQI; fikker-G63t-NHOI=SJAbMdehiJUDWfKFJ8sRwBkpc4QR5d3b; fikker-G63t-NHOI=SJAbMdehiJUDWfKFJ8sRwBkpc4QR5d3b; fikker-EvqM-cpAV=cB3KyFSvmrcdSRIR7HwIKTNRU63lC0cP; fikker-EvqM-cpAV=cB3KyFSvmrcdSRIR7HwIKTNRU63lC0cP; fikker-cdgH-UTIt=iRQ6QXipabJJUH7OsT1dwTQjqrirW6OK; Hm_lpvt_5eb81c3b57ea700d51556a83f9cebcfe=1530238589");
         HttpResponse response = httpRequest.send();
-        //String cookie = response.header("Cookie");
-        //System.out.println("cookie:"+cookie);
         return response;
     }
 
@@ -75,6 +74,51 @@ public class JoddHttp {
         return response;
     }
 
+    public HttpResponse sendBrowserByGet(String url,String refer,Map formMap) {
+        String domainName = null;
+        try {
+            domainName = AppUtils.extraDomain(url);
+        } catch (MalformedURLException e) {
+            logger.warn("",e);
+            return null;
+        }
+        HttpBrowser browser = browsers.get(domainName);
+        if(browser==null){
+            browser = new HttpBrowser();
+            browsers.put(domainName,browser);
+        }
+        HttpRequest request = HttpRequest.get(url);
+        String mac = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36";
+        //request.header("User-Agent",mac);
+        request.header("referer",refer);
+        request.form(formMap);
+        browser.sendRequest(request);
+        HttpResponse response = browser.getHttpResponse();
+        return response;
+    }
+
+    public HttpResponse sendBrowserByPost(String url,String refer,Map formMap) {
+        String domainName = null;
+        try {
+            domainName = AppUtils.extraDomain(url);
+        } catch (MalformedURLException e) {
+            logger.warn("",e);
+            return null;
+        }
+        HttpBrowser browser = browsers.get(domainName);
+        if(browser==null){
+            browser = new HttpBrowser();
+            browsers.put(domainName,browser);
+        }
+        HttpRequest request = HttpRequest.post(url);
+        request.header("User-Agent",randomUA());
+        request.header("referer",refer);
+        request.form(formMap);
+        browser.sendRequest(request);
+        HttpResponse response = browser.getHttpResponse();
+        return response;
+    }
+
     private String randomUA() {
         int length = USER_AGENTS.length;
         Random random = new Random();
@@ -82,12 +126,28 @@ public class JoddHttp {
         return USER_AGENTS[idx];
     }
 
+    private void test1(){
+        String url = "https://m.xiaoshuoli.com/ph/week_1.html";
+        HttpResponse response = sendBrowser(url, url);
+        System.out.println(response);
+    }
+
+    private void test2(){
+        String url = "http://020mk.cn/tools/mypan.php";
+        Map queryMap = new HashMap();
+        queryMap.put("action","get");
+        queryMap.put("token","ZMfW9rcb1NAag3l2");
+        queryMap.put("key","t5");
+        queryMap.put("content","this is test!!");
+        HttpResponse response = sendBrowserByPost(url, url,queryMap);
+        System.out.println("["+response.body()+"]");
+    }
+
+
+
     public static void main(String[] args) throws MalformedURLException {
         JoddHttp joddHttp = new JoddHttp();
-        String url = "https://m.xiaoshuoli.com/ph/week_1.html";
-        HttpResponse response = joddHttp.sendBrowser(url, url);
-        joddHttp.sendBrowser(url, url);
-        System.out.println(response);
+        joddHttp.test2();
 
     }
 }

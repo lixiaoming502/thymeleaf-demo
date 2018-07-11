@@ -32,6 +32,11 @@
         <appender-ref ref="CONSOLE"/>
     </root>
 
+
+    <logger name="com.example.thymeleaf" level="debug">
+
+    </logger>
+
 <!--
     addtivity:是否向上级loger传递打印信息。默认是true。若设置为true，则也会下root中传递信息，将日志信息记录到root下指定的file文件中！
 -->

@@ -48,9 +48,10 @@ public class FuturePageLoaderCroner {
                 Date next  = AppUtils.addSecond(gap,last);
                 Date now = new Date();
                 if(next.before(now)){
-                    futureCrawlerCfg.setLastCrawlTime(now);
-                    futureCrawlerCfgService.update(futureCrawlerCfg);
                     crawl(futurePageLoader);
+                    final Date afterCrawlerTime = new Date();
+                    futureCrawlerCfg.setLastCrawlTime(afterCrawlerTime);
+                    futureCrawlerCfgService.update(futureCrawlerCfg);
                 }
             }
         }
@@ -62,7 +63,10 @@ public class FuturePageLoaderCroner {
         HttpResponse response = joddHttp.sendBrowser(futurePageLoader.getPageUrl(),futurePageLoader.getPageUrl());
         int statusCode = response.statusCode();
         if(statusCode!=200){
-            logger.warn("get statusCode "+statusCode);
+            logger.warn("get statusCode "+statusCode+" recrawl later");
+            response = joddHttp.sendBrowser(futurePageLoader.getPageUrl(),futurePageLoader.getPageUrl());
+            statusCode = response.statusCode();
+            logger.warn(" recrawl get statusCode "+statusCode);
         }
         //更新状态，写文件，如果写文件异常则回滚
         try {

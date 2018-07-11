@@ -22,6 +22,22 @@ public abstract class AbstractCrawler implements Crawler {
     public Integer domainId;
 
 
+    public boolean parse(int level, int crawlerId, Integer domainId, String url){
+        this.domainId = domainId;
+        switch (level){
+            case 1:
+                return praseLevel1(crawlerId,url);
+            case 2:
+                return parseLevel2(crawlerId,url);
+        }
+        return false;
+    }
+
+    protected abstract boolean parseLevel2(int crawlerId, String url);
+
+    protected abstract boolean praseLevel1(int crawlerId, String url);
+
+
     protected DriverFuture createDriverFuture(int crawlerId, String url) {
         DriverFuture future = new DriverFuture(crawlerId,domainId,url);
         selfDriver.fetch(future);

@@ -1,5 +1,6 @@
 package com.example.thymeleaf.controller;
 
+import com.example.thymeleaf.service.BiquGSearchService;
 import com.example.thymeleaf.service.JoddHttp;
 import jodd.http.HttpResponse;
 import jodd.util.Base64;
@@ -23,6 +24,9 @@ public class CrawlerController {
     @Autowired
     private JoddHttp joddHttp;
 
+    @Autowired
+    private BiquGSearchService biquGSearchService;
+
     @RequestMapping("/contents/myproject1/test1.php")
     public void proxy(@RequestParam("url") String base64URL, HttpServletResponse httpServletResponse) throws IOException {
         String url = new String(Base64.decode(base64URL));
@@ -32,6 +36,12 @@ public class CrawlerController {
         byte[] resp = response.bodyBytes();
         httpServletResponse.getOutputStream().write(resp);
         httpServletResponse.getOutputStream().flush();
+    }
+
+    @RequestMapping("/contents/myproject1/search.php")
+    public String search(String title){
+        logger.info("get title "+title);
+        return biquGSearchService.search_xbq(title.trim());
     }
 
 }
