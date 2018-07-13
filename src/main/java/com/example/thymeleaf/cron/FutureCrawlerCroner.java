@@ -34,7 +34,7 @@ public class FutureCrawlerCroner {
     @Autowired
     private SeedsService seedsService;
 
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 1000)
     public void work(){
         logger.info("FutureCrawlerCroner start");
         //1.找到不同的domain_id

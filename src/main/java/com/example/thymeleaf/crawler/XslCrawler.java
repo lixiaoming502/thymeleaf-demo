@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by lixiaoming on 2018/6/27.
@@ -21,7 +23,21 @@ public class XslCrawler extends AbstractCrawler{
 
     private static Logger logger = LoggerFactory.getLogger(XslCrawler.class);
 
-    private String baseUrl = "https://m.xiaoshuoli.com/";
+    private String baseUrl = "https://m.xiaoshuoli.com";
+
+    static Map<String,Integer> sortMap = new HashMap<>();
+    static {
+        sortMap.put("言情小说",1);
+        sortMap.put("仙侠修真",2);
+        sortMap.put("都市小说",3);
+        sortMap.put("历史小说",4);
+        sortMap.put("玄幻小说",5);
+        sortMap.put("网游小说",6);
+        sortMap.put("竞技小说",7);
+        sortMap.put("科幻小说",8);
+        sortMap.put("其他小说",9);
+        sortMap.put("精选小说",10);
+    }
 
     public boolean praseLevel1(int crawlerId,String url){
         if(hasCrawlerPageWaiting(crawlerId)){
@@ -68,6 +84,12 @@ public class XslCrawler extends AbstractCrawler{
         }
     }
 
+    public boolean parseLevel2(int crawlerId,String url){
+        final String cssQuery = "#chapterlist a";
+        return parseLevel2(crawlerId, url, cssQuery,baseUrl);
+    }
+
+
     private JSONObject parseInfo(DriverFuture future) {
         String respone;
         Document doc;
@@ -77,17 +99,44 @@ public class XslCrawler extends AbstractCrawler{
         String img = doc.select(".synopsisArea_detail img").get(0).attr("src");
         String title = doc.select("h1.title").get(0).text();
         String author = doc.select("p.author").get(0).text();
+        //作者：许微笑
+        int idx = author.indexOf("：");
+        if(idx>0){
+            author = author.replace("小说免费阅读","");
+            author = author.substring(idx+1);
+        }
         String sort = doc.select("p.sort").get(0).text();
         String review = doc.select("p.review").get(0).text();
-        //author = correct(author);
+        String infoUrl = future.getPageUrl();
+        //body > div.synopsisArea > div > p:nth-child(4)
+        String status = doc.select(".synopsisArea_detail p").get(2).text();
+        int iStatus = 1;
+        if(status.contains("连载中")){
+            iStatus = 0;
+        }
         JSONObject cpo = new JSONObject();
-        cpo.put("chpUrl",baseUrl+chpUrl);
+        cpo.put("list_url",baseUrl+chpUrl);
         cpo.put("img",img);
         cpo.put("title",title);
         cpo.put("author",author);
-        cpo.put("sort",sort);
+        cpo.put("sort",convertSort(sort));
         cpo.put("review",review);
+        cpo.put("info_url",infoUrl);
+        cpo.put("status",iStatus);
         return cpo;
+    }
+
+    private int convertSort(String sort) {
+        //类别：都市小说
+        int idx = sort.indexOf("：");
+        String s =  sort.substring(idx+1).trim();
+        final Integer integer = sortMap.get(s);
+        if(integer==null){
+            //throw new IllegalArgumentException(sort);
+            logger.warn("undefined sort "+sort);
+            return -1;
+        }
+        return integer;
     }
 
     private String correct(String title) {
@@ -95,9 +144,5 @@ public class XslCrawler extends AbstractCrawler{
             title = title.substring(0,3);
         }
         return title;
-    }
-
-    public boolean parseLevel2(int crawlerId,String url){
-        return false;
     }
 }

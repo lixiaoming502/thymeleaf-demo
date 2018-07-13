@@ -38,6 +38,10 @@ public class FutureCrawlerService {
         return futureCrawlerMapper.selectByExample(example);
     }
 
+    public int addNew(FutureCrawler futureCrawler){
+        return futureCrawlerMapper.insert(futureCrawler);
+    }
+
     public void update(FutureCrawler futureCrawler) {
         futureCrawlerMapper.updateByPrimaryKeySelective(futureCrawler);
     }
@@ -76,5 +80,29 @@ public class FutureCrawlerService {
         }else{
             return lst.get(0);
         }
+    }
+
+    public FutureCrawler queryByCrawlerId(int crawlerId) {
+        return futureCrawlerMapper.selectByPrimaryKey(crawlerId);
+    }
+
+    public List<FutureCrawler> getToBeCallBack() {
+        int pageNum = 1;
+        int pageSize = 10;
+        PageHelper.startPage(pageNum, pageSize);
+        FutureCrawlerExample example = new FutureCrawlerExample();
+        FutureCrawlerExample.Criteria criteria = example.createCriteria();
+        criteria.andCrawlerStateEqualTo("F");
+        criteria.andCallbackStatusEqualTo(0);
+        example.setOrderByClause("id");
+        List<FutureCrawler> lst = futureCrawlerMapper.selectByExample(example);
+        return lst;
+    }
+
+    public int getWaitingLength() {
+        FutureCrawlerExample example = new FutureCrawlerExample();
+        FutureCrawlerExample.Criteria criteria = example.createCriteria();
+        criteria.andCrawlerStateEqualTo("A");
+        return futureCrawlerMapper.countByExample(example);
     }
 }

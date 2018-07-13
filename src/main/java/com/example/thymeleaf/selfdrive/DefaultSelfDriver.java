@@ -2,6 +2,7 @@ package com.example.thymeleaf.selfdrive;
 
 import com.example.thymeleaf.cron.FuturePageLoaderCroner;
 import com.example.thymeleaf.model.FuturePageLoader;
+import com.example.thymeleaf.service.FutureCrawlerCfgService;
 import com.example.thymeleaf.service.FuturePageLoaderService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -25,6 +26,9 @@ public class DefaultSelfDriver implements SelfDriver {
     @Autowired
     private FuturePageLoaderService futurePageLoaderService;
 
+    @Autowired
+    private FutureCrawlerCfgService futureCrawlerCfgService;
+
     @Override
     public DriverFuture fetch(DriverFuture driverFuture) {
         //根据ID，pageURL判断是否存在
@@ -40,7 +44,8 @@ public class DefaultSelfDriver implements SelfDriver {
                 File file = new File(futurePageLoader.getResponse());
                 String content = null;
                 try {
-                    content = FileUtils.readFileToString(file,"UTF8");
+                    //final String charset = getCharset(driverFuture.getDomainId());
+                    content = FileUtils.readFileToString(file, "UTF8");
                 } catch (IOException e) {
                     logger.warn("",e);
                 }
@@ -49,5 +54,9 @@ public class DefaultSelfDriver implements SelfDriver {
             }
         }
         return driverFuture;
+    }
+
+    private String getCharset(Integer domainId) {
+        return futureCrawlerCfgService.queryByDomainId(domainId).getCharset();
     }
 }

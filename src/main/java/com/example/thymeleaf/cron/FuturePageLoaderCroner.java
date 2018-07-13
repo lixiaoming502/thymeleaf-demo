@@ -48,7 +48,7 @@ public class FuturePageLoaderCroner {
                 Date next  = AppUtils.addSecond(gap,last);
                 Date now = new Date();
                 if(next.before(now)){
-                    crawl(futurePageLoader);
+                    crawl(futurePageLoader,futureCrawlerCfg.getCharset());
                     final Date afterCrawlerTime = new Date();
                     futureCrawlerCfg.setLastCrawlTime(afterCrawlerTime);
                     futureCrawlerCfgService.update(futureCrawlerCfg);
@@ -58,7 +58,7 @@ public class FuturePageLoaderCroner {
         logger.info("FuturePageLoaderCroner end");
     }
 
-    private void crawl(FuturePageLoader futurePageLoader) {
+    private void crawl(FuturePageLoader futurePageLoader,String charset ) {
         logger.info("strat crawl ["+futurePageLoader.getPageUrl()+"]");
         HttpResponse response = joddHttp.sendBrowser(futurePageLoader.getPageUrl(),futurePageLoader.getPageUrl());
         int statusCode = response.statusCode();
@@ -70,7 +70,7 @@ public class FuturePageLoaderCroner {
         }
         //更新状态，写文件，如果写文件异常则回滚
         try {
-            String body = new String(response.bodyBytes(),"utf-8");
+            String body = new String(response.bodyBytes(),charset);
             futurePageLoaderService.loadComplete(futurePageLoader.getId(),statusCode,body);
         }catch (Exception e){
             logger.warn("",e);
