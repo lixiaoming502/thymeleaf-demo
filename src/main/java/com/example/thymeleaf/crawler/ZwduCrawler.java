@@ -25,4 +25,9 @@ public class ZwduCrawler extends AbstractCrawler{
     protected boolean praseLevel1(int crawlerId, String url) {
         return false;
     }
+
+    @Override
+    protected boolean isMatch(String content) {
+        return false;
+    }
 }

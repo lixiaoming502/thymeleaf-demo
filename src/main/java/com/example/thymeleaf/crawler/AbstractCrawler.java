@@ -78,6 +78,7 @@ public abstract class AbstractCrawler implements Crawler {
     protected int extractSeqId(String title) {
         final String numbers = AppUtils.getNumbers(title);
         if(StringUtils.isEmpty(numbers)){
+            logger.info("extractSeqId failed title:"+title);
             return -1;
         }
         return Integer.parseInt(numbers);
@@ -94,20 +95,26 @@ public abstract class AbstractCrawler implements Crawler {
 
             Elements items = doc.select(cssQuery);
             JSONArray jsonArray = new JSONArray();
+            int seqId = 0;
             for (Element item : items) {
                 String href  = item.attr("href");
                 if(href.startsWith("#")){
                     continue;
                 }
+                if(!isMatch(href)){
+                    logger.info("unmatched ["+href+"]");
+                    continue;
+                }
+                seqId++;
                 String title = item.text();
-                int seqId = extractSeqId(title);
+                /*int seqId = extractSeqId(title);
                 if(seqId<0){
                     if(title.startsWith("序章")){
                         seqId=0;
                     }else{
                         continue;
                     }
-                }
+                }*/
                 String chapTitle = extractChapTitle(title);
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("href",rootURL+href);
@@ -125,4 +132,6 @@ public abstract class AbstractCrawler implements Crawler {
         }
         return false;
     }
+
+    protected abstract boolean isMatch(String content);
 }

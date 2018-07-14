@@ -13,14 +13,16 @@ import org.springframework.stereotype.Service;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by lixiaoming on 2018/7/5.
  */
 @Service
-public class BiquGSearchService {
+public class SearchService {
 
-    private static Log logger = LogFactory.getLog(BiquGSearchService.class);
+    private static Log logger = LogFactory.getLog(SearchService.class);
 
     @Autowired
     private JoddHttp joddHttp;
@@ -151,10 +153,46 @@ public class BiquGSearchService {
         return null;
     }
 
+    public String search(String title) {
+        String url = this.search_xbq(title);
+        if(url==null){
+            url = this.search_yq(title);
+        }
+        if(url==null){
+            url = this.search_kk(title);
+        }
+        if(url==null){
+            url = this.search_lw(title);
+        }
+        return url;
+    }
+
+    public List<String> searchAll(String title) {
+        List<String> rets = new ArrayList<>();
+        String url = this.search_xbq(title);
+        if(url!=null){
+            rets.add(url);
+        }
+        url = this.search_yq(title);
+        if(url!=null){
+            rets.add(url);
+        }
+        url = this.search_kk(title);
+        if(url!=null){
+            rets.add(url);
+        }
+        url = this.search_lw(title);
+        if(url!=null){
+            rets.add(url);
+        }
+
+        return rets;
+    }
+
     public static void main(String[] args) {
-        BiquGSearchService biquGSearchService = new BiquGSearchService();
+        SearchService biquGSearchService = new SearchService();
         biquGSearchService.joddHttp = new JoddHttp();
-        String title ="山里汉宠妻：捡来的媳妇";
+        String title ="烽烟乱世遇佳人";
         System.out.println(biquGSearchService.search_lw(title));
     }
 }

@@ -1,6 +1,6 @@
 package com.example.thymeleaf.controller;
 
-import com.example.thymeleaf.service.BiquGSearchService;
+import com.example.thymeleaf.service.SearchService;
 import com.example.thymeleaf.service.JoddHttp;
 import jodd.http.HttpResponse;
 import jodd.util.Base64;
@@ -25,7 +25,7 @@ public class CrawlerController {
     private JoddHttp joddHttp;
 
     @Autowired
-    private BiquGSearchService biquGSearchService;
+    private SearchService biquGSearchService;
 
     @RequestMapping("/contents/myproject1/test1.php")
     public void proxy(@RequestParam("url") String base64URL, HttpServletResponse httpServletResponse) throws IOException {

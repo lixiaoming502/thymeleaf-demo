@@ -15,6 +15,11 @@ public class BiquGCrawler extends AbstractCrawler {
     }
 
     @Override
+    protected boolean isMatch(String content) {
+        return false;
+    }
+
+    @Override
     protected boolean parseLevel2(int crawlerId, String url) {
         return false;
     }

@@ -19,7 +19,7 @@ public class FixInvalidArticle {
     private static Log logger = LogFactory.getLog(FixInvalidArticle.class);
 
     @Autowired
-    private  BiquGSearchService biquGSearchService;
+    private SearchService biquGSearchService;
 
     public void work() throws Exception {
         String sql = "select * FROM `t_article` WHERE status=2 order by id";
@@ -30,7 +30,7 @@ public class FixInvalidArticle {
             JSONObject element  = (JSONObject)jsonObject;
             String title  = element.getString("title");
             logger.debug(title);
-            String replaceUrl = search(title);
+            String replaceUrl = biquGSearchService.search(title);
             int articleId = element.getInteger("id");
             if(replaceUrl!=null){
                 updateUrl(articleId,replaceUrl);
@@ -55,19 +55,7 @@ public class FixInvalidArticle {
         logger.info("ret:"+ret);
     }
 
-    private String search(String title) {
-        String url = biquGSearchService.search_xbq(title);
-        if(url==null){
-            url = biquGSearchService.search_yq(title);
-        }
-        if(url==null){
-            url = biquGSearchService.search_kk(title);
-        }
-        if(url==null){
-            url = biquGSearchService.search_lw(title);
-        }
-        return url;
-    }
+
 
     public static void main(String[] args) throws Exception {
         FixInvalidArticle fixInvalidArticle = new FixInvalidArticle();

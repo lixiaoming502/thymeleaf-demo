@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by lixiaoming on 2018/6/27.
@@ -144,5 +146,12 @@ public class XslCrawler extends AbstractCrawler{
             title = title.substring(0,3);
         }
         return title;
+    }
+
+    protected boolean isMatch(String content){
+        //String content = "/i23739/6921515.html";
+        Pattern pattern = Pattern.compile("/i\\d+/\\d+.html");
+        Matcher matcher = pattern.matcher(content);
+        return matcher.find();
     }
 }

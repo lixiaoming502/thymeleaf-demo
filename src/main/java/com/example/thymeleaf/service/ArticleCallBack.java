@@ -10,9 +10,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by lixiaoming on 2018/7/12.
@@ -32,6 +37,7 @@ public class ArticleCallBack {
     @Autowired
     private FutureCrawlerService futureCrawlerService;
 
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor=Exception.class)
     public void callback(int level,int crawlerId){
         switch (level){
             case 1:
@@ -87,8 +93,16 @@ public class ArticleCallBack {
         Article exist = articleService.queryByListURL(record.getPageUrl());
         final Integer artileId = exist.getId();
         int maxSeqId = chapterService.getMaxSeqId(artileId);
-        for(Object obj:jsonArray) {
-            JSONObject info = (JSONObject) obj;
+
+        //JSONArray排序
+        List<JSONObject> lst = jsonArray.toJavaList(JSONObject.class);
+        Collections.sort(lst, (o1, o2) -> {
+            int seqId1 = o1.getInteger("seqId");
+            int seqId2 = o2.getInteger("seqId");
+            return seqId1-seqId2;
+        });
+
+        for(JSONObject info:lst) {
             int seqId = info.getInteger("seqId");
             if(seqId>maxSeqId){
                 Chapter chapter = new Chapter();
@@ -99,7 +113,17 @@ public class ArticleCallBack {
                 String url = info.getString("href");
                 chapter.setUrl(url);
                 chapter.setCollectFlag(false);
-                chapterService.addRecord(chapter);
+                try{
+                    chapterService.addRecord(chapter);
+                }catch (Exception e){
+                    if(e instanceof org.springframework.dao.DuplicateKeyException){
+                        logger.info("duplicate url:"+url+" articleId:"+artileId+" crawlerId "+crawlerId);
+                        continue;
+                    }else{
+                        logger.warn("callback_level2-error:",e);
+                        throw e;
+                    }
+                }
             }
         }
     }

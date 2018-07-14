@@ -40,9 +40,13 @@ public class FutureCrawlerCallBackCroner {
 
         String beanName = futureCrawler.getCallbackBean();
         ArticleCallBack articleCallBack = (ArticleCallBack) ApplicationContextProvider.getBean(beanName);
-        articleCallBack.callback(futureCrawler.getCallbackLevel(),crawlerId);
-
-        futureCrawler.setCallbackStatus(1);
+        try{
+            articleCallBack.callback(futureCrawler.getCallbackLevel(),crawlerId);
+            futureCrawler.setCallbackStatus(1);
+        }catch (Exception e){
+            futureCrawler.setCallbackStatus(2);
+            logger.warn("callback error!",e);
+        }
         futureCrawler.setUpdateTime(new Date());
         futureCrawlerService.update(futureCrawler);
     }

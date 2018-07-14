@@ -44,9 +44,29 @@ public class ArticleService {
         PageHelper.startPage(pageNum, pageSize);
         ArticleExample example = new ArticleExample();
         ArticleExample.Criteria condition = example.createCriteria();
-        condition.andModifyDateLessThan(AppUtils.getCurrentDay());
-        ArticleExample.Criteria condition2 = example.or();
-        condition2.andModifyDateIsNull();
+        condition.andModifyDateIsNull();
+        List<Article> lst = articleMapper.selectByExample(example);
+        return lst;
+    }
+
+    public List<Article> getNoBrothers() {
+        int pageNum = 1;
+        int pageSize = 2;
+        PageHelper.startPage(pageNum, pageSize);
+        ArticleExample example = new ArticleExample();
+        ArticleExample.Criteria condition = example.createCriteria();
+        condition.andBrotherStateIsNull();
+        List<Article> lst = articleMapper.selectByExample(example);
+        return lst;
+    }
+
+    public List<Article> getToBeUpdate(int maxtArticleId) {
+        int pageNum = 1;
+        int pageSize = 10;
+        PageHelper.startPage(pageNum, pageSize);
+        ArticleExample example = new ArticleExample();
+        ArticleExample.Criteria condition = example.createCriteria();
+        condition.andIdGreaterThan(maxtArticleId);
         List<Article> lst = articleMapper.selectByExample(example);
         return lst;
     }

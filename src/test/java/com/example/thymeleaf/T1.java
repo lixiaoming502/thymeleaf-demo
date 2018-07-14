@@ -1,16 +1,23 @@
 package com.example.thymeleaf;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.example.thymeleaf.service.JoddHttp;
 import jodd.http.HttpBrowser;
 import jodd.http.HttpRequest;
 import jodd.http.HttpResponse;
 import jodd.util.Base64;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by lixiaoming on 2018/6/28.
@@ -76,6 +83,36 @@ public class T1 {
         System.out.println(URLDecoder.decode(d1));
     }
 
+    private void sortJson(){
+        String path = "/Users/lixiaoming/Downloads/crawler_10972.txt";
+        JSONArray jsonArray = parseToJsonArray(path);
+        List<JSONObject> lst = jsonArray.toJavaList(JSONObject.class);
+        Collections.sort(lst, new Comparator<JSONObject>() {
+            @Override
+            public int compare(JSONObject o1, JSONObject o2) {
+                int seqId1 = o1.getInteger("seqId");
+                int seqId2 = o2.getInteger("seqId");
+                return seqId1-seqId2;
+            }
+        });
+        for(JSONObject o:lst){
+            System.out.println(o.getInteger("seqId"));
+        }
+
+    }
+
+    private JSONArray parseToJsonArray(String path ) {
+        JSONArray jsonArray = null;
+        try {
+            String content  = FileUtils.readFileToString(new File(path),"utf8");
+            jsonArray = JSONArray.parseArray(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return jsonArray;
+    }
+
+
 
 
     public static void main(String[] args) throws IOException {
@@ -83,7 +120,8 @@ public class T1 {
         //t1.testBrowser();
         //t1.testDecodeBase64();
         //t1.genSql();
-        t1.t2();
+        t1.sortJson();
+
 
     }
 }

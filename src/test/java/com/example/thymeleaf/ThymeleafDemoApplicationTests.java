@@ -44,6 +44,9 @@ public class ThymeleafDemoApplicationTests {
 	@Autowired
 	private FutureCrawlerCallBackCroner futureCrawlerCallBackCroner;
 
+	@Autowired
+	private BrotherCroner brotherCroner;
+
 
 	@Test
 	public void contextLoads() {
@@ -103,6 +106,11 @@ public class ThymeleafDemoApplicationTests {
 	@Test
 	public void test_futureCrawlerCallBackCroner(){
 		futureCrawlerCallBackCroner.work();
+	}
+
+	@Test
+	public void test_brotherCroner(){
+		brotherCroner.work();
 	}
 
 }

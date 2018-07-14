@@ -43,6 +43,7 @@
         <table schema="" tableName="t_seeds" domainObjectName="Seed"></table>
         <table schema="" tableName="t_article" domainObjectName="Article"></table>
         <table schema="" tableName="t_chapter" domainObjectName="Chapter"></table>
+        <table schema="" tableName="t_brother" domainObjectName="Brother"></table>
 
     </context>
 </generatorConfiguration>
