@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,20 +24,6 @@ public class XslCrawler extends AbstractCrawler{
     private static Logger logger = LoggerFactory.getLogger(XslCrawler.class);
 
     private String baseUrl = "https://m.xiaoshuoli.com";
-
-    static Map<String,Integer> sortMap = new HashMap<>();
-    static {
-        sortMap.put("言情小说",1);
-        sortMap.put("仙侠修真",2);
-        sortMap.put("都市小说",3);
-        sortMap.put("历史小说",4);
-        sortMap.put("玄幻小说",5);
-        sortMap.put("网游小说",6);
-        sortMap.put("竞技小说",7);
-        sortMap.put("科幻小说",8);
-        sortMap.put("其他小说",9);
-        sortMap.put("精选小说",10);
-    }
 
     public boolean praseLevel1(int crawlerId,String url){
         if(hasCrawlerPageWaiting(crawlerId)){

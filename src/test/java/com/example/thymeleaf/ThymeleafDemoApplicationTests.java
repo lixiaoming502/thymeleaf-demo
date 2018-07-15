@@ -67,6 +67,14 @@ public class ThymeleafDemoApplicationTests {
 	}
 
 	@Test
+	public void testCrawler_pageloader_crawler(){
+		futureCrawlerCroner.work();
+		AppUtils.sleep(5);
+		futurePageLoaderCroner.work();
+		futureCrawlerCroner.work();
+	}
+
+	@Test
 	public void test_futureCrawlerService(){
 		FutureCrawler ff = futureCrawlerService.getToBeCrawlByDomainId(1);
 		System.out.println(ff);

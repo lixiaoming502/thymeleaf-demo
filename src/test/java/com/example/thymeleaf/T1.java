@@ -18,6 +18,8 @@ import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by lixiaoming on 2018/6/28.
@@ -112,6 +114,13 @@ public class T1 {
         return jsonArray;
     }
 
+    private void isMatch(){
+        String content = "/html/102/102846/24330165.html";
+        Pattern pattern = Pattern.compile("/html/\\d+/\\d+/\\d+.html");
+        Matcher matcher = pattern.matcher(content);
+        System.out.println(matcher.find());
+    }
+
 
 
 
@@ -120,7 +129,8 @@ public class T1 {
         //t1.testBrowser();
         //t1.testDecodeBase64();
         //t1.genSql();
-        t1.sortJson();
+        //t1.sortJson();
+        t1.isMatch();
 
 
     }

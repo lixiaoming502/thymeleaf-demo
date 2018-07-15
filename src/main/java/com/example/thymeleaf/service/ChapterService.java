@@ -51,4 +51,28 @@ public class ChapterService {
             return lst.get(0).getArtileId();
         }
     }
+
+    public List<Chapter> getToBeCrawl() {
+        int pageNum = 1;
+        int pageSize = 10;
+        PageHelper.startPage(pageNum, pageSize);
+        ChapterExample chapterExample = new ChapterExample();
+        chapterExample.createCriteria().andCollectFlagEqualTo(false);
+        chapterExample.setOrderByClause("id ");
+        List<Chapter> lst = chapterMapper.selectByExample(chapterExample);
+        return lst;
+    }
+
+    public int selectLike(String pureText, int articleId) {
+        ChapterExample chapterExample = new ChapterExample();
+        ChapterExample.Criteria condition = chapterExample.createCriteria();
+        condition.andArtileIdEqualTo(articleId);
+        condition.andTitleLike(pureText);
+        chapterExample.setOrderByClause("id desc");
+        List<Chapter> lst = chapterMapper.selectByExample(chapterExample);
+        if(CollectionUtils.isNotEmpty(lst)&&lst.size()==1){
+            return lst.get(0).getId();
+        }
+        return 0;
+    }
 }

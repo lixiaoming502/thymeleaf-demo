@@ -5,28 +5,20 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.thymeleaf.model.Article;
 import com.example.thymeleaf.model.Chapter;
 import com.example.thymeleaf.model.FutureCrawler;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by lixiaoming on 2018/7/12.
  */
 @Component
-public class ArticleCallBack {
+public class ArticleCallBack extends AbstractCallBack{
 
     private static Log logger = LogFactory.getLog(ArticleCallBack.class);
-
 
     @Autowired
     private ArticleService articleService;
@@ -34,22 +26,8 @@ public class ArticleCallBack {
     @Autowired
     private ChapterService chapterService;
 
-    @Autowired
-    private FutureCrawlerService futureCrawlerService;
 
-    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor=Exception.class)
-    public void callback(int level,int crawlerId){
-        switch (level){
-            case 1:
-                callback_level1(crawlerId);
-                break;
-            case 2:
-                callback_level2(crawlerId);
-                break;
-        }
-    }
-
-    private void callback_level1(int crawlerId) {
+    protected void callback_level1(int crawlerId) {
         logger.info("callback_level1 entry,crawlerId "+crawlerId);
         FutureCrawler record = futureCrawlerService.queryByCrawlerId(crawlerId);
         JSONArray jsonArray = parseToJsonArray(record);
@@ -87,7 +65,7 @@ public class ArticleCallBack {
         }
     }
 
-    private void callback_level2(int crawlerId) {
+    protected void callback_level2(int crawlerId) {
         FutureCrawler record = futureCrawlerService.queryByCrawlerId(crawlerId);
         JSONArray jsonArray = parseToJsonArray(record);
         Article exist = articleService.queryByListURL(record.getPageUrl());
@@ -95,12 +73,7 @@ public class ArticleCallBack {
         int maxSeqId = chapterService.getMaxSeqId(artileId);
 
         //JSONArray排序
-        List<JSONObject> lst = jsonArray.toJavaList(JSONObject.class);
-        Collections.sort(lst, (o1, o2) -> {
-            int seqId1 = o1.getInteger("seqId");
-            int seqId2 = o2.getInteger("seqId");
-            return seqId1-seqId2;
-        });
+        List<JSONObject> lst = parseToList(jsonArray);
 
         for(JSONObject info:lst) {
             int seqId = info.getInteger("seqId");
@@ -128,15 +101,6 @@ public class ArticleCallBack {
         }
     }
 
-    private JSONArray parseToJsonArray(FutureCrawler record) {
-        JSONArray jsonArray = null;
-        try {
-            String path = record.getResponse();
-            String content  = FileUtils.readFileToString(new File(path),"utf8");
-            jsonArray = JSONArray.parseArray(content);
-        } catch (IOException e) {
-            logger.warn(e);
-        }
-        return jsonArray;
-    }
+
+
 }
