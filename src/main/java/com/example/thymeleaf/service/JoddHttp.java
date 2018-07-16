@@ -69,7 +69,13 @@ public class JoddHttp {
         HttpRequest request = HttpRequest.get(url);
         request.header("User-Agent",randomUA());
         request.header("referer",refer);
-        browser.sendRequest(request);
+        try{
+            browser.sendRequest(request);
+        }catch (Exception e){
+            browsers.remove(domainName);
+            logger.warn("sendRequest failed,remove "+domainName+" from browsers",e);
+        }
+
         HttpResponse response = browser.getHttpResponse();
         return response;
     }

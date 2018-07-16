@@ -105,4 +105,12 @@ public class FutureCrawlerService {
         criteria.andCrawlerStateEqualTo("A");
         return futureCrawlerMapper.countByExample(example);
     }
+
+    public int getMaxLen(Integer domainId) {
+        FutureCrawlerExample example = new FutureCrawlerExample();
+        FutureCrawlerExample.Criteria criteria = example.createCriteria();
+        criteria.andDomainIdEqualTo(domainId);
+        criteria.andCrawlerStateEqualTo("A");
+        return futureCrawlerMapper.countByExample(example);
+    }
 }

@@ -4,7 +4,6 @@ import com.example.thymeleaf.model.Article;
 import com.example.thymeleaf.model.FutureCrawler;
 import com.example.thymeleaf.model.FutureCrawlerCfg;
 import com.example.thymeleaf.service.ArticleService;
-import com.example.thymeleaf.service.ChapterService;
 import com.example.thymeleaf.service.FutureCrawlerCfgService;
 import com.example.thymeleaf.service.FutureCrawlerService;
 import com.example.thymeleaf.util.AppUtils;
@@ -28,13 +27,10 @@ public class ChapterCallBackCroner {
 
     private static Log logger = LogFactory.getLog(ChapterCallBackCroner.class);
 
-    private static final int MAXLEN = 100;
+    private static final int MAXLEN = 20;
 
     @Autowired
     private ArticleService articleService;
-
-    @Autowired
-    private ChapterService chapterService;
 
     @Autowired
     private FutureCrawlerCfgService futureCrawlerCfgService;
@@ -45,22 +41,16 @@ public class ChapterCallBackCroner {
     @Scheduled(fixedDelay = 10000)
     public void work(){
         logger.info("ChapterCallBackCroner start");
-        int waitLen = futureCrawlerService.getWaitingLength();
-        if(waitLen<MAXLEN){
-            //int maxtArticleId = chapterService.getMaxArticlId();
-            //logger.info("maxtArticleId:"+maxtArticleId);
-            List<Article> toBeCalls = articleService.getToBeUpdate();
-            for(Article article:toBeCalls){
+        List<Article> toBeCalls = articleService.getToBeUpdate();
+        toBeCalls.stream().forEach(article -> {
+            if(updateChapterList(article)){
                 logger.info("article_id:"+article.getId());
-                updateChapterList(article);
             }
-        }else{
-            logger.info("waitLen:"+waitLen);
-        }
+        });
         logger.info("FutureCrawlerCallBackCroner end");
     }
 
-    private void updateChapterList(Article article) {
+    private boolean updateChapterList(Article article) {
         String listUrl = article.getListUrl();
 
         String domainName = null;
@@ -68,6 +58,11 @@ public class ChapterCallBackCroner {
             domainName = AppUtils.extraDomain(listUrl);
             FutureCrawlerCfg cfg = futureCrawlerCfgService.queryByDomain(domainName);
             Integer domainId = cfg.getId();
+            int curLen = getmaxLen(domainId);
+            if(curLen>MAXLEN){
+                logger.info("maxLen exceed!domainId "+domainId);
+                return false;
+            }
             int level = 2;
             String crawlerState = "A";
             FutureCrawler futureCrawler = new FutureCrawler();
@@ -87,7 +82,12 @@ public class ChapterCallBackCroner {
         } catch (MalformedURLException e) {
             logger.warn("",e);
         }
+        return true;
 
+    }
+
+    private int getmaxLen(Integer domainId) {
+        return  futureCrawlerService.getMaxLen(domainId);
     }
 
 }

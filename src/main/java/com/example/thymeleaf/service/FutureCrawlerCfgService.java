@@ -3,6 +3,7 @@ package com.example.thymeleaf.service;
 import com.example.thymeleaf.dao.FutureCrawlerCfgMapper;
 import com.example.thymeleaf.model.FutureCrawlerCfg;
 import com.example.thymeleaf.model.FutureCrawlerCfgExample;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,9 @@ public class FutureCrawlerCfgService {
         FutureCrawlerCfgExample.Criteria criteria = example.createCriteria();
         criteria.andDomainNameEqualTo(domain);
         final List<FutureCrawlerCfg> futureCrawlerCfgs = futureCrawlerCfgMapper.selectByExample(example);
+        if(CollectionUtils.isEmpty(futureCrawlerCfgs)){
+            return null;
+        }
         return futureCrawlerCfgs.get(0);
     }
 

@@ -42,7 +42,7 @@ public class BrotherCroner {
     @Autowired
     private FutureCrawlerService futureCrawlerService;
 
-    private static final int MAXLEN = 100;
+    private static final int MAXLEN = 20;
 
     @Scheduled(fixedDelay = 3000)
     public void work(){
@@ -51,17 +51,21 @@ public class BrotherCroner {
     }
 
     private void findBrotherChapterList() {
-        int waitLen = futureCrawlerService.getWaitingLength();
-        if(waitLen>MAXLEN){
-            return;
-        }
         List<Brother> lst = brotherService.selectByUpdateTurns(0);
         lst.stream().forEach(brother -> {
             try {
                 final String brotherUrl = brother.getBrotherUrl();
                 String domainName = AppUtils.extraDomain(brotherUrl);
                 FutureCrawlerCfg cfg = futureCrawlerCfgService.queryByDomain(domainName);
+                if(cfg==null){
+                    logger.warn("can't get domainName cfg,["+domainName+"] borther_id ["+brother.getBrotherId()+"]");
+                    return;
+                }
                 Integer domainId = cfg.getId();
+                if(futureCrawlerService.getMaxLen(domainId)>MAXLEN){
+                    logger.info("maxLen exceed!domainId "+domainId);
+                    return;
+                }
                 int level = 2;
                 String crawlerState = "A";
                 FutureCrawler futureCrawler = new FutureCrawler();
