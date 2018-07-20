@@ -10,7 +10,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.net.MalformedURLException;
@@ -44,10 +43,12 @@ public class BrotherCroner {
 
     private static final int MAXLEN = 20;
 
-    @Scheduled(fixedDelay = 3000)
+    //@Scheduled(fixedDelay = 3000)
     public void work(){
+        logger.info("BrotherCroner entry");
         findArticleBrother();
         findBrotherChapterList();
+        logger.info("BrotherCroner end");
     }
 
     private void findBrotherChapterList() {

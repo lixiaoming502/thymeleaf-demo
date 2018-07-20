@@ -10,7 +10,6 @@ import com.example.thymeleaf.util.AppUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.net.MalformedURLException;
@@ -38,7 +37,7 @@ public class ChapterCallBackCroner {
     @Autowired
     private FutureCrawlerService futureCrawlerService;
 
-    @Scheduled(fixedDelay = 10000)
+    //@Scheduled(fixedDelay = 10000)
     public void work(){
         logger.info("ChapterCallBackCroner start");
         List<Article> toBeCalls = articleService.getToBeUpdate();

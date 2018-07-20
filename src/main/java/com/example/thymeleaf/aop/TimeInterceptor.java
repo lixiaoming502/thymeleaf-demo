@@ -4,9 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.stereotype.Component;
 
 /**  
  * 检测方法执行耗时的spring切面类  
@@ -14,8 +12,8 @@ import org.springframework.stereotype.Component;
  * @author blinkfox  
  * @date 2016-07-04  
  */  
-@Aspect  
-@Component
+//@Aspect
+//@Component
 public class TimeInterceptor {  
   
     private static Log logger = LogFactory.getLog("timeLog");

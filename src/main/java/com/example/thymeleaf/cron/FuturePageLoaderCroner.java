@@ -10,7 +10,6 @@ import jodd.http.HttpResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -34,7 +33,7 @@ public class FuturePageLoaderCroner {
     @Autowired
     private FutureCrawlerCfgService futureCrawlerCfgService;
 
-    @Scheduled(fixedDelay = 1000)
+    //@Scheduled(fixedDelay = 1000)
     public void work(){
         logger.info("FuturePageLoaderCroner begin");
         //1.找到不同的domain_id

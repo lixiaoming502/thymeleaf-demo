@@ -10,7 +10,6 @@ import com.example.thymeleaf.service.SeedsService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -34,7 +33,7 @@ public class FutureCrawlerCroner {
     @Autowired
     private SeedsService seedsService;
 
-    @Scheduled(fixedDelay = 1000)
+    //@Scheduled(fixedDelay = 1000)
     public void work(){
         logger.info("FutureCrawlerCroner start");
         //1.找到不同的domain_id

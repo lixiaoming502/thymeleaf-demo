@@ -43,6 +43,8 @@ public class JoddHttp {
 
     private Map<String,HttpBrowser> browsers = new HashMap<String,HttpBrowser>();
 
+    Map<Thread,String> threadLocal = new HashMap<>();
+
     public HttpResponse send(String url,String refer){
         HttpRequest httpRequest = HttpRequest.get(url);
         httpRequest.header("User-Agent",randomUA());
@@ -53,6 +55,13 @@ public class JoddHttp {
         return response;
     }
 
+    public void removeDomain(Thread thread){
+        String domainName = threadLocal.get(thread);
+        if(domainName!=null){
+            browsers.remove(domainName);
+        }
+    }
+
     public HttpResponse sendBrowser(String url,String refer) {
         String domainName = null;
         try {
@@ -61,6 +70,7 @@ public class JoddHttp {
             logger.warn("",e);
             return null;
         }
+        threadLocal.put(Thread.currentThread(),domainName);
         HttpBrowser browser = browsers.get(domainName);
         if(browser==null){
             browser = new HttpBrowser();

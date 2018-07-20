@@ -1,5 +1,6 @@
 package com.example.thymeleaf.aop;
 
+import com.example.thymeleaf.service.JoddHttp;
 import com.example.thymeleaf.util.AppUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -7,6 +8,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -24,6 +26,9 @@ import java.util.Set;
 public class CronInterceptor {
   
     private static Log logger = LogFactory.getLog(CronInterceptor.class);
+
+    @Autowired
+    private JoddHttp joddHttp;
   
     // 一分钟，即60000ms  
     private static final long ONE_MINUTE = 60000;  
@@ -33,27 +38,42 @@ public class CronInterceptor {
 
     private Map<Thread,Long>  holds = new HashMap<>();
 
+    static Thread longCheckThread;
+
     CronInterceptor(){
+        startMonitor();
+    }
+
+    private void startMonitor() {
         Runnable r = () -> {
             for(;;){
                 logger.info("check start ");
                 Set<Thread> keys = holds.keySet();
                 for(Thread key:keys){
                     long t1 = holds.get(key);
-                    if(System.currentTimeMillis()-t1>5*ONE_MINUTE){
+                    final long timeEclipse = System.currentTimeMillis() - t1;
+                    if(timeEclipse >5*ONE_MINUTE){
                         StackTraceElement[] trace = key.getStackTrace();
                         StringBuffer traceinfo = AppUtils.getStackBuffer(trace);
+                        logger.warn("timeEclipse ["+timeEclipse+"] key ["+key.getId()+"]");
                         logger.warn("traceInfo:["+traceinfo.toString()+"]");
+                        joddHttp.removeDomain(key);
+                        holds.remove(key);
                         key.interrupt();
                     }
                 }
-                AppUtils.sleep(120);
+                AppUtils.sleep(60);
             }
         };
-        Thread thread = new Thread(r,"long-check-thread");
-        thread.start();
+        synchronized (this){
+            if(longCheckThread!=null&&longCheckThread.isAlive()){
+                return;
+            }
+            longCheckThread = new Thread(r,"long-check-thread");
+            longCheckThread.start();
+        }
     }
-  
+
     /**  
      * 统计方法执行耗时Around环绕通知  
      * @param joinPoint  
@@ -61,6 +81,10 @@ public class CronInterceptor {
      */  
     @Around(POINT)  
     public Object timeAround(ProceedingJoinPoint joinPoint) throws Throwable {
+        if(!longCheckThread.isAlive()){
+            logger.warn("longCheckThread dead!restart later");
+            startMonitor();
+        }
         // 定义返回对象、得到方法需要的参数  
         Object obj = null;  
         Object[] args = joinPoint.getArgs();  
@@ -72,7 +96,7 @@ public class CronInterceptor {
         try {  
             obj = joinPoint.proceed(args);  
         } catch (Throwable e) {  
-            //logger.error("统计某方法执行耗时环绕通知出错", e);
+            logger.error("统计某方法执行耗时环绕通知出错", e);
             throw e;
         }finally {
             holds.remove(Thread.currentThread());

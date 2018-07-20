@@ -7,7 +7,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -28,7 +27,7 @@ public class PanCroner {
     @Autowired
     private MyPan myPan;
 
-    @Scheduled(fixedDelay = 1000)
+    //@Scheduled(fixedDelay = 1000)
     public void work(){
         logger.info("PanCroner start");
         List<FuturePageLoader> lst = futurePageLoaderService.getUnPaned();

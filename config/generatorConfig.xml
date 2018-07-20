@@ -45,6 +45,7 @@
         <table schema="" tableName="t_chapter" domainObjectName="Chapter"></table>
         <table schema="" tableName="t_brother" domainObjectName="Brother"></table>
         <table schema="" tableName="t_brother_chapter" domainObjectName="BrotherChapter"></table>
+        <table schema="" tableName="t_schedule_task" domainObjectName="ScheduleTask"></table>
 
     </context>
 </generatorConfiguration>

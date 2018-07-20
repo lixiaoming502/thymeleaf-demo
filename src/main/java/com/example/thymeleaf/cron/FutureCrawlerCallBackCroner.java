@@ -7,7 +7,6 @@ import com.example.thymeleaf.service.FutureCrawlerService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -16,7 +15,7 @@ import java.util.List;
 /**
  * Created by lixiaoming on 2018/6/27.
  *
- * <p>回调调度器</p>
+ * <p>crawler回调调度器</p>
  */
 @Component
 public class FutureCrawlerCallBackCroner {
@@ -25,7 +24,7 @@ public class FutureCrawlerCallBackCroner {
     @Autowired
     private FutureCrawlerService futureCrawlerService;
 
-    @Scheduled(fixedDelay = 10000)
+    //@Scheduled(fixedDelay = 10000)
     public void work(){
         logger.info("FutureCrawlerCallBackCroner start");
         List<FutureCrawler> toBeCalls = futureCrawlerService.getToBeCallBack();
