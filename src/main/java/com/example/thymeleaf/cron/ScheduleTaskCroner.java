@@ -19,8 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * job1:find article brother
- * job2:find brother list
+ * 根据t_schedule_task表，进行调度分配
  * Created by lixiaoming on 2018/7/13.
  */
 @Component
@@ -77,5 +76,9 @@ public class ScheduleTaskCroner {
             }
         });
         logger.info("ScheduleTaskCroner end");
+    }
+
+    public void removeInprocess(String beanName){
+        inProcessBeans.remove(beanName);
     }
 }

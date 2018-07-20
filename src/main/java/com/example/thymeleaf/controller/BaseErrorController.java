@@ -17,7 +17,8 @@ public class BaseErrorController implements ErrorController {
         return "error";
     }
     @RequestMapping
-    public String error() {
+    public String error(Exception e) {
+        logger.warn("",e);
         return getErrorPath();
     }
 

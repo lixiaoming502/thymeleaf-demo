@@ -1,5 +1,6 @@
 package com.example.thymeleaf.aop;
 
+import com.example.thymeleaf.cron.ScheduleTaskCroner;
 import com.example.thymeleaf.service.JoddHttp;
 import com.example.thymeleaf.util.AppUtils;
 import org.apache.commons.logging.Log;
@@ -29,6 +30,9 @@ public class CronInterceptor {
 
     @Autowired
     private JoddHttp joddHttp;
+
+    @Autowired
+    private ScheduleTaskCroner scheduleTaskCroner;
   
     // 一分钟，即60000ms  
     private static final long ONE_MINUTE = 60000;  
@@ -56,10 +60,15 @@ public class CronInterceptor {
                         StackTraceElement[] trace = key.getStackTrace();
                         StringBuffer traceinfo = AppUtils.getStackBuffer(trace);
                         logger.warn("timeEclipse ["+timeEclipse+"] key ["+key.getId()+"]");
-                        logger.warn("traceInfo:["+traceinfo.toString()+"]");
+                        final String traceString = traceinfo.toString();
+                        logger.warn("traceInfo:["+ traceString +"]");
                         joddHttp.removeDomain(key);
                         holds.remove(key);
                         key.interrupt();
+                        if(traceString.contains("com.example.thymeleaf.cron.BrotherCroner")){
+                            logger.warn("remove brotherCroner");
+                            scheduleTaskCroner.removeInprocess("brotherCroner");
+                        }
                     }
                 }
                 AppUtils.sleep(60);
