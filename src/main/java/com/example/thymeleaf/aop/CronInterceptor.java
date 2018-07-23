@@ -12,9 +12,9 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**  
  * 检测方法执行耗时的spring切面类  
@@ -40,7 +40,7 @@ public class CronInterceptor {
     // service层的统计耗时切面，类型必须为final String类型的,注解里要使用的变量只能是静态常量类型的  
     public static final String POINT = "execution ( * com.example.thymeleaf.cron.*.work())";
 
-    private Map<Thread,Long>  holds = new HashMap<>();
+    private Map<Thread,Long>  holds = new ConcurrentHashMap<>();
 
     static Thread longCheckThread;
 

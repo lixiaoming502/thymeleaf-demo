@@ -11,7 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,7 +74,67 @@ public class XslCrawler extends AbstractCrawler{
         }
     }
 
-    public boolean parseLevel2(int crawlerId,String url){
+    @Override
+    protected boolean parseLevel3(int crawlerId, String url) {
+        final String cssQueryNext = "#pb_next";
+        final String cssQueryContent = "#chaptercontent";
+        if(hasCrawlerPageWaiting(crawlerId)){
+            return false;
+        }
+        DriverFuture future = createDriverFuture(crawlerId, url);
+        if(future.isDone()) {
+            String respone = (String) future.getRespone();
+            Document doc = Jsoup.parse(respone);
+
+            Elements items = doc.select(cssQueryNext);
+            Element next = items.get(0);
+            String nextUrl = next.attr("href");
+            logger.info("nextUrl:"+nextUrl);
+            DriverFuture futureNext = createDriverFuture(crawlerId, baseUrl+nextUrl);
+            if(futureNext.isDone()){
+                String respone2 = (String) futureNext.getRespone();
+                String c1 = extratPageConent(cssQueryContent, respone);
+                String c2 = extratPageConent(cssQueryContent, respone2);
+                String s1 = parseString(c1);
+                String s2 = parseString(c2);
+                try {
+                    futureCrawlerService.finish(crawlerId,"F",s1+s2);
+                    return true;
+                } catch (IOException e) {
+                    logger.warn("",e);
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    private String parseString(String input){
+        BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(input.getBytes(Charset.forName("utf8"))), Charset.forName("utf8")));
+        String line;
+        StringBuffer strbuf=new StringBuffer();
+        try {
+            while ( (line = br.readLine()) != null ) {
+                if(!line.contains("请点击下一页继续阅读")&&
+                        !line.contains("addBookMarkByManual")){
+                    strbuf.append(line+"\n");
+                }
+            }
+        } catch (IOException e) {
+            logger.warn("",e);
+        }
+
+        return strbuf.toString();
+    }
+
+    private String extratPageConent(String cssQueryContent, String respone2) {
+        Document doc2 = Jsoup.parse(respone2);
+        Elements items2 = doc2.select(cssQueryContent);
+        String content2 = items2.get(0).html();
+        return content2;
+    }
+
+    public boolean parseLevel2(int crawlerId, String url){
         final String cssQuery = "#chapterlist a";
         return parseLevel2(crawlerId, url, cssQuery,baseUrl);
     }

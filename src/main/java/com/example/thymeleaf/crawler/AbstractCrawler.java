@@ -61,9 +61,13 @@ public abstract class AbstractCrawler implements Crawler {
                 return praseLevel1(crawlerId,url);
             case 2:
                 return parseLevel2(crawlerId,url);
+            case 3:
+                return parseLevel3(crawlerId,url);
         }
         return false;
     }
+
+    protected abstract boolean parseLevel3(int crawlerId, String url);
 
     protected abstract boolean parseLevel2(int crawlerId, String url);
 
@@ -101,6 +105,29 @@ public abstract class AbstractCrawler implements Crawler {
         return Integer.parseInt(numbers);
     }
 
+    protected boolean parseLevel3(int crawlerId, String url, String cssQuery) {
+        if(hasCrawlerPageWaiting(crawlerId)){
+            return false;
+        }
+        DriverFuture future = createDriverFuture(crawlerId, url);
+        if(future.isDone()) {
+            String respone = (String) future.getRespone();
+            Document doc = Jsoup.parse(respone);
+
+            Elements items = doc.select(cssQuery);
+            Element content = items.get(0);
+            String htmlContent = content.html();
+            try {
+                futureCrawlerService.finish(crawlerId,"F",htmlContent);
+                return true;
+            } catch (IOException e) {
+                logger.warn("",e);
+                return false;
+            }
+        }
+        return false;
+    }
+
     protected boolean parseLevel2(int crawlerId, String url, String cssQuery,String rootURL) {
         if(hasCrawlerPageWaiting(crawlerId)){
             return false;
@@ -124,14 +151,6 @@ public abstract class AbstractCrawler implements Crawler {
                 }
                 seqId++;
                 String title = item.text();
-                /*int seqId = extractSeqId(title);
-                if(seqId<0){
-                    if(title.startsWith("序章")){
-                        seqId=0;
-                    }else{
-                        continue;
-                    }
-                }*/
                 String chapTitle = extractChapTitle(title);
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("href",rootURL+href);

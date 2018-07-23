@@ -75,4 +75,23 @@ public class ChapterService {
         }
         return 0;
     }
+
+    public void update(Chapter chapter) {
+        chapterMapper.updateByPrimaryKey(chapter);
+    }
+
+    public Chapter queryByLocalUrl(String localUrl) {
+        int pageNum = 1;
+        int pageSize = 1;
+        PageHelper.startPage(pageNum, pageSize);
+        ChapterExample chapterExample = new ChapterExample();
+        chapterExample.createCriteria().andLocalUrlEqualTo(localUrl);
+        chapterExample.setOrderByClause("id ");
+        List<Chapter> lst = chapterMapper.selectByExample(chapterExample);
+        return lst.get(0);
+    }
+
+    public Chapter queryById(Integer refId) {
+        return chapterMapper.selectByPrimaryKey(refId);
+    }
 }

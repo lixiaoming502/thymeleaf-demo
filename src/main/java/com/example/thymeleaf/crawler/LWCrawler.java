@@ -18,6 +18,13 @@ public class LWCrawler extends AbstractCrawler {
     private String baseUrl = "https://www.lewen8.com";
 
     @Override
+    protected boolean parseLevel3(int crawlerId, String url) {
+        //#content
+        final String cssQuery = "#content";
+        return parseLevel3(crawlerId, url, cssQuery);
+    }
+
+    @Override
     protected boolean parseLevel2(int crawlerId, String url) {
         //#chapterlist > ul:nth-child(22) > li:nth-child(49) > a
         final String cssQuery = "#chapterlist a";

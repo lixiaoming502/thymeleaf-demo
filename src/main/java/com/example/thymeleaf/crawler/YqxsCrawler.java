@@ -18,6 +18,13 @@ public class YqxsCrawler extends AbstractCrawler {
     private String baseUrl = "http://www.yqxs.cc";
 
     @Override
+    protected boolean parseLevel3(int crawlerId, String url) {
+        //#content
+        final String cssQuery = "#content";
+        return parseLevel3(crawlerId, url, cssQuery);
+    }
+
+    @Override
     protected boolean parseLevel2(int crawlerId, String url) {
         //body > div.listmain > dl > dd:nth-child(6) > a
         final String cssQuery = "div.listmain dl dd a";

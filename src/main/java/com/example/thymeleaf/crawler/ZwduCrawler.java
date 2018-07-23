@@ -15,6 +15,11 @@ public class ZwduCrawler extends AbstractCrawler{
     private String rootURL = "http://www.zwdu.com";
 
     @Override
+    protected boolean parseLevel3(int crawlerId, String url) {
+        return false;
+    }
+
+    @Override
     protected boolean parseLevel2(int crawlerId, String url) {
         final String cssQuery = "#list dl dd a";
         return parseLevel2(crawlerId, url, cssQuery,rootURL);

@@ -45,4 +45,10 @@ public class BrotherChapterService {
     public int addRecord(BrotherChapter chapter) {
         return brotherChapterMapper.insert(chapter);
     }
+
+    public List<BrotherChapter> queryByChapterId(int chapterId){
+        BrotherChapterExample brotherChapterExample = new BrotherChapterExample();
+        brotherChapterExample.createCriteria().andChapterIdEqualTo(chapterId);
+        return brotherChapterMapper.selectByExample(brotherChapterExample);
+    }
 }

@@ -65,6 +65,21 @@ public class ArticleCallBack extends AbstractCallBack{
         }
     }
 
+    @Override
+    protected void callback_level3(int crawlerId) {
+        FutureCrawler record = futureCrawlerService.queryByCrawlerId(crawlerId);
+        //更新t_chapter_url为crawler的response
+        final Integer refId = record.getRefId();
+        Chapter chapter = null;
+        if(refId==null){
+            chapter = chapterService.queryByLocalUrl(record.getPageUrl()+"I");
+        }else{
+            chapter = chapterService.queryById(refId);
+        }
+        chapter.setLocalUrl(record.getResponse());
+        chapterService.update(chapter);
+    }
+
     protected void callback_level2(int crawlerId) {
         FutureCrawler record = futureCrawlerService.queryByCrawlerId(crawlerId);
         JSONArray jsonArray = parseToJsonArray(record);

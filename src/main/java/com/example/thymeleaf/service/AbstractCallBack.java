@@ -31,8 +31,13 @@ public abstract class AbstractCallBack implements CallBack {
             case 2:
                 callback_level2(crawlerId);
                 break;
+            case 3:
+                callback_level3(crawlerId);
+                break;
         }
     }
+
+    protected abstract void callback_level3(int crawlerId);
 
     protected abstract void callback_level2(int crawlerId);
 

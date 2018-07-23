@@ -34,6 +34,11 @@ public class BrotherCallBack extends AbstractCallBack{
         //TODO:
     }
 
+    @Override
+    protected void callback_level3(int crawlerId) {
+
+    }
+
     /**
      * get the content of a chapter
      * @param crawlerId

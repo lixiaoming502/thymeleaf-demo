@@ -20,6 +20,11 @@ public class BiquGCrawler extends AbstractCrawler {
     }
 
     @Override
+    protected boolean parseLevel3(int crawlerId, String url) {
+        return false;
+    }
+
+    @Override
     protected boolean parseLevel2(int crawlerId, String url) {
         return false;
     }

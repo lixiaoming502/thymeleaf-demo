@@ -18,6 +18,12 @@ public class KKCrawler extends AbstractCrawler {
     private String baseUrl = "http://www.12kanshu.com";
 
     @Override
+    protected boolean parseLevel3(int crawlerId, String url) {
+        final String cssQuery = "#chapterContent p";
+        return parseLevel3(crawlerId, url, cssQuery);
+    }
+
+    @Override
     protected boolean parseLevel2(int crawlerId, String url) {
         final String cssQuery = "td.chapterBean a";
         return parseLevel2(crawlerId, url, cssQuery,url);
