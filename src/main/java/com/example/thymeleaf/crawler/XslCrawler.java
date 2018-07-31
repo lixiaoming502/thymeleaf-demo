@@ -87,23 +87,21 @@ public class XslCrawler extends AbstractCrawler{
             Document doc = Jsoup.parse(respone);
 
             Elements items = doc.select(cssQueryNext);
-            Element next = items.get(0);
-            String nextUrl = next.attr("href");
-            logger.info("nextUrl:"+nextUrl);
-            DriverFuture futureNext = createDriverFuture(crawlerId, baseUrl+nextUrl);
-            if(futureNext.isDone()){
-                String respone2 = (String) futureNext.getRespone();
-                String c1 = extratPageConent(cssQueryContent, respone);
-                String c2 = extratPageConent(cssQueryContent, respone2);
-                String s1 = parseString(c1);
-                String s2 = parseString(c2);
-                try {
-                    futureCrawlerService.finish(crawlerId,"F",s1+s2);
-                    return true;
-                } catch (IOException e) {
-                    logger.warn("",e);
-                    return false;
+            if(items.size()>0){
+                Element next = items.get(0);
+                String nextUrl = next.attr("href");
+                logger.info("nextUrl:"+nextUrl);
+                DriverFuture futureNext = createDriverFuture(crawlerId, baseUrl+nextUrl);
+                if(futureNext.isDone()){
+                    String respone2 = (String) futureNext.getRespone();
+                    String c1 = extratPageConent(cssQueryContent, respone);
+                    String c2 = extratPageConent(cssQueryContent, respone2);
+                    String s1 = parseString(c1);
+                    String s2 = parseString(c2);
+                    return updateCrawlerResponse(crawlerId, "F", s1+s2);
                 }
+            }else{
+                return updateCrawlerResponse(crawlerId, "E", "");
             }
         }
         return false;

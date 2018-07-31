@@ -94,7 +94,13 @@ public class BrotherCroner {
         List<Article> articles = articleService.getNoBrothers();
         articles.stream().forEach(article->{
             String title = article.getTitle();
-            List<String> urls = searchService.searchAll(title);
+            logger.info("title:["+title+"] id "+article.getId()+"]");
+            List<String> urls = null;
+            try{
+                urls = searchService.searchAll(title);
+            }catch (Exception e){
+                logger.warn("",e);
+            }
             if(CollectionUtils.isEmpty(urls)){
                 article.setBrotherState("E");
             }else{

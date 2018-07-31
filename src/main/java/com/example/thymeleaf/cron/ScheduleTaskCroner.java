@@ -56,12 +56,15 @@ public class ScheduleTaskCroner {
                     String beanMethod = scheduleTask.getBeanMethod();
                     Object bean = ApplicationContextProvider.getBean(beanName);
                     lock.lock();
-                    if(inProcessBeans.contains(beanName)){
+                    try{
+                        if(inProcessBeans.contains(beanName)){
+                            return;
+                        }
+                        inProcessBeans.add(beanName);
+                    }finally {
                         lock.unlock();
-                        return;
                     }
-                    inProcessBeans.add(beanName);
-                    lock.unlock();
+
                     try {
                         Method method = bean.getClass().getMethod(beanMethod);
                         method.invoke(bean);

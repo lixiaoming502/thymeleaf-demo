@@ -68,6 +68,8 @@ public class CronInterceptor {
                         if(traceString.contains("com.example.thymeleaf.cron.BrotherCroner")){
                             logger.warn("remove brotherCroner");
                             scheduleTaskCroner.removeInprocess("brotherCroner");
+                        }else if(traceString.contains("com.example.thymeleaf.cron.PanCroner")){
+                            scheduleTaskCroner.removeInprocess("panCroner");
                         }
                     }
                 }

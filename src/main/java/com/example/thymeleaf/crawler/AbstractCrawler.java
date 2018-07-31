@@ -170,4 +170,15 @@ public abstract class AbstractCrawler implements Crawler {
     }
 
     protected abstract boolean isMatch(String content);
+
+
+    protected boolean updateCrawlerResponse(int crawlerId, String crawlerState,String response) {
+        try {
+            futureCrawlerService.finish(crawlerId,crawlerState,response);
+            return true;
+        } catch (IOException e) {
+            logger.warn("",e);
+            return false;
+        }
+    }
 }

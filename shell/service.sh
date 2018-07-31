@@ -1,5 +1,5 @@
 #!/bin/bash
-jvm_arg='-Xmx128m -Xms128m -XX:MaxMetaspaceSize=50m -XX:-UseCompressedClassPointers'
+jvm_arg='-Xmx512m -Xms128m -XX:MaxMetaspaceSize=300m -XX:-UseCompressedClassPointers'
 jar_name='thymeleaf-demo-0.0.1-SNAPSHOT.jar'
 service_name='crawler-service'
 pid=$(ps x | grep $jar_name|grep $2 | grep -v grep | awk '{print $1}')
@@ -35,7 +35,6 @@ status(){
         fi
 }
 
-
 case "$1" in
         start)
                 start $2
@@ -51,7 +50,7 @@ case "$1" in
                 ;;
         restart)
                 stop
-                start
+                start $2
                 RETVAL=$?
                 ;;
         *)
