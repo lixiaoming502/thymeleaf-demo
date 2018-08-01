@@ -15,6 +15,8 @@ import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by lixiaoming on 2018/7/5.
@@ -33,7 +35,7 @@ public class SearchService {
     private String kkbaseUrl = "http://www.12kanshu.com/plus/search.php?kwtype=0&searchtype=&q=";
     private String lwbaseUrl = "https://www.lewen8.com/searchbook.php?keyword=";
 
-    public String search_xbq(String title){
+    public String search_xbq(String title) throws InterruptedException, ExecutionException, TimeoutException {
         String fullURL = baseUrl+title;
         HttpResponse response = joddHttp.sendBrowser(fullURL, fullURL);
         if(response.statusCode()== HttpURLConnection.HTTP_OK){
@@ -52,7 +54,7 @@ public class SearchService {
         return null;
     }
 
-    public String search_yq(String title){
+    public String search_yq(String title) throws InterruptedException, ExecutionException, TimeoutException {
         String fullURL = yqbaseUrl+title;
         HttpResponse response = joddHttp.sendBrowser(fullURL, fullURL);
         if(response.statusCode()== HttpURLConnection.HTTP_OK){
@@ -71,7 +73,7 @@ public class SearchService {
         return null;
     }
 
-    public String search_kk(String title){
+    public String search_kk(String title) throws InterruptedException, ExecutionException, TimeoutException {
         if(title.length()>10){
             title = title.substring(0,10);
         }
@@ -101,7 +103,7 @@ public class SearchService {
         return null;
     }
 
-    public String search_lw(String title){
+    public String search_lw(String title) throws InterruptedException, ExecutionException, TimeoutException {
         final String maohao = "：";
         if(title.contains(maohao)){
             int idx = title.indexOf(maohao);
@@ -154,34 +156,68 @@ public class SearchService {
     }
 
     public String search(String title) {
-        String url = this.search_xbq(title);
-        if(url==null){
-            url = this.search_yq(title);
+        String url = null;
+        try {
+            url = this.search_xbq(title);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         if(url==null){
-            url = this.search_kk(title);
+            try {
+                url = this.search_yq(title);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         if(url==null){
-            url = this.search_lw(title);
+            try {
+                url = this.search_kk(title);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if(url==null){
+            try {
+                url = this.search_lw(title);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return url;
     }
 
     public List<String> searchAll(String title) {
         List<String> rets = new ArrayList<>();
-        String url = this.search_xbq(title);
+        String url = null;
+        try {
+            url = this.search_xbq(title);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if(url!=null){
             rets.add(url);
         }
-        url = this.search_yq(title);
+        try {
+            url = this.search_yq(title);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if(url!=null){
             rets.add(url);
         }
-        url = this.search_kk(title);
+        try {
+            url = this.search_kk(title);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if(url!=null){
             rets.add(url);
         }
-        url = this.search_lw(title);
+        try {
+            url = this.search_lw(title);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if(url!=null){
             rets.add(url);
         }
@@ -189,7 +225,7 @@ public class SearchService {
         return rets;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException, ExecutionException, TimeoutException {
         SearchService biquGSearchService = new SearchService();
         biquGSearchService.joddHttp = new JoddHttp();
         String title ="烽烟乱世遇佳人";

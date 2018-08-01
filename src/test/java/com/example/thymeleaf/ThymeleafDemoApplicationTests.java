@@ -4,11 +4,19 @@ import com.example.thymeleaf.cron.*;
 import com.example.thymeleaf.model.FutureCrawler;
 import com.example.thymeleaf.service.*;
 import com.example.thymeleaf.util.AppUtils;
+import com.example.thymeleaf.vo.SearchResultPage;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -49,6 +57,9 @@ public class ThymeleafDemoApplicationTests {
 
 	@Autowired
 	private ChapterContentCallBackCroner chapterContentCallBackCroner;
+
+	@Autowired
+	private BaiduBrother baiduBrother;
 
 
 	@Test
@@ -127,6 +138,62 @@ public class ThymeleafDemoApplicationTests {
 	@Test
 	public void test_chapterContentCallBackCroner(){
 		chapterContentCallBackCroner.work();
+	}
+
+	@Test
+	public void test_baiduBrother() throws UnsupportedEncodingException, InterruptedException, ExecutionException, TimeoutException {
+		String title = "满城东风许佳人";
+		List<String> pureLst = baiduBrother.loadPureChpLst(12);
+		List<Pair> all = new ArrayList<>();
+		SearchResultPage r = baiduBrother.search(title);
+		if(r.getResultItems().size()>0){
+			cc(pureLst, all, r);
+
+			System.out.println("=================next page1================"+r.getResultItems().size());
+			r = baiduBrother.searchNextFromURL(r.getNextPage());
+			cc(pureLst, all, r);
+
+			System.out.println("=================next page2================"+r.getResultItems().size());
+			r = baiduBrother.searchNextFromURL(r.getNextPage());
+			cc(pureLst, all, r);
+
+			System.out.println("=================next page3================"+r.getResultItems().size());
+			r = baiduBrother.searchNextFromURL(r.getNextPage());
+			cc(pureLst, all, r);
+
+			System.out.println("=================next page4================"+r.getResultItems().size());
+			r = baiduBrother.searchNextFromURL(r.getNextPage());
+			cc(pureLst, all, r);
+		}
+
+
+
+
+		all.stream().forEach(pair -> {
+			System.out.println(pair.getLeft()+"|"+pair.getRight());
+		});
+		//String url = r.getResultItems().get(0);
+		//System.out.println("select:"+url);
+
+	}
+
+	private void cc(List<String> pureLst, List<Pair> all, SearchResultPage r) {
+		long t1 = System.currentTimeMillis();
+
+		r.getResultItems().stream().forEach(url->{
+			try {
+				System.out.println("select:"+url);
+				Pair pair = baiduBrother.analysisCssSelector(url, pureLst);
+				//System.out.println(pair.getLeft()+"|"+pair.getRight());
+				if(pair!=null){
+					all.add(pair);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+		long cost = System.currentTimeMillis()-t1;
+		System.out.println("cost "+cost );
 	}
 
 }

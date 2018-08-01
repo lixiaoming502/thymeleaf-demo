@@ -81,17 +81,17 @@ public class FuturePageLoaderCroner {
 
     private void crawl(FuturePageLoader futurePageLoader,String charset ) {
         logger.info("strat crawl ["+futurePageLoader.getPageUrl()+"]");
-        HttpResponse response = joddHttp.sendBrowser(futurePageLoader.getPageUrl(),futurePageLoader.getPageUrl());
-        int statusCode = response.statusCode();
-        if(statusCode!=200){
-            logger.warn("get statusCode "+statusCode+" recrawl later");
-            response = joddHttp.sendBrowser(futurePageLoader.getPageUrl(),futurePageLoader.getPageUrl());
-            statusCode = response.statusCode();
-            logger.warn(" recrawl get statusCode "+statusCode);
-        }
-        //更新状态，写文件，如果写文件异常则回滚
         try {
+            HttpResponse response = joddHttp.sendBrowser(futurePageLoader.getPageUrl(),futurePageLoader.getPageUrl());
+            int statusCode = response.statusCode();
+            if(statusCode!=200){
+                logger.warn("get statusCode "+statusCode+" recrawl later");
+                response = joddHttp.sendBrowser(futurePageLoader.getPageUrl(),futurePageLoader.getPageUrl());
+                statusCode = response.statusCode();
+                logger.warn(" recrawl get statusCode "+statusCode);
+            }
             String body = new String(response.bodyBytes(),charset);
+            //更新状态，写文件，如果写文件异常则回滚
             futurePageLoaderService.loadComplete(futurePageLoader.getId(),statusCode,body);
         }catch (Exception e){
             logger.warn("",e);

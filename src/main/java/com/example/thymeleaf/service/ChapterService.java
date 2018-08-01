@@ -52,6 +52,17 @@ public class ChapterService {
         }
     }
 
+    public List<Chapter> selectByArticleId(int articleId) {
+        int pageNum = 1;
+        int pageSize = 100;
+        PageHelper.startPage(pageNum, pageSize);
+        ChapterExample chapterExample = new ChapterExample();
+        chapterExample.createCriteria().andArtileIdEqualTo(articleId);
+        chapterExample.setOrderByClause("id ");
+        List<Chapter> lst = chapterMapper.selectByExample(chapterExample);
+        return lst;
+    }
+
     public List<Chapter> getToBeCrawl() {
         int pageNum = 1;
         int pageSize = 10;

@@ -65,6 +65,17 @@ public class AppUtils {
         return "";
     }
 
+    public static String extractChapTitle(String title) {
+        int index = title.indexOf(" ");
+        String content =  title.substring(index+1);
+        int idx1 = content.indexOf("第");
+        int idx2  = content.indexOf("章");
+        if(idx1>-1&&idx2>0&&idx2>idx1){
+            content =  title.substring(idx2+1);
+        }
+        return content;
+    }
+
     public static String getPureNumbers(String content) {
         Pattern pattern = Pattern.compile("\\d+");
         Matcher matcher = pattern.matcher(content);

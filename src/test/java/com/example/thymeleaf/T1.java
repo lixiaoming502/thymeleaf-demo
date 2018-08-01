@@ -18,6 +18,8 @@ import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,7 +52,7 @@ public class T1 {
 
     }
 
-    private void testDecodeBase64() throws UnsupportedEncodingException {
+    private void testDecodeBase64() throws UnsupportedEncodingException, InterruptedException, ExecutionException, TimeoutException {
         String base64URL = "aHR0cDovL3d3dy44MXp3LmNvbS9ib29rLzI0NDgyLw==";
         String url = new String(Base64.decode(base64URL));
         System.out.println(url);

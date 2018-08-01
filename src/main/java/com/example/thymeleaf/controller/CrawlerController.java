@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by lixiaoming on 2018/6/27.
@@ -28,7 +30,7 @@ public class CrawlerController {
     private SearchService biquGSearchService;
 
     @RequestMapping("/contents/myproject1/test1.php")
-    public void proxy(@RequestParam("url") String base64URL, HttpServletResponse httpServletResponse) throws IOException {
+    public void proxy(@RequestParam("url") String base64URL, HttpServletResponse httpServletResponse) throws IOException, InterruptedException, ExecutionException, TimeoutException {
         String url = new String(Base64.decode(base64URL));
         logger.info("recev:["+url+"]");
         HttpResponse response = joddHttp.sendBrowser(url, url);
@@ -39,7 +41,7 @@ public class CrawlerController {
     }
 
     @RequestMapping("/contents/myproject1/search.php")
-    public String search(String title){
+    public String search(String title) throws InterruptedException, ExecutionException, TimeoutException {
         logger.info("get title "+title);
         return biquGSearchService.search_xbq(title.trim());
     }

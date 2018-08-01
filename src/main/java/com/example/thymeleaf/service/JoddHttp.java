@@ -12,7 +12,7 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 /**
  * Created by lixiaoming on 2018/6/28.
@@ -63,7 +63,21 @@ public class JoddHttp {
         }
     }
 
-    public HttpResponse sendBrowser(String url,String refer) {
+    public HttpResponse sendBrowser(String url,String refer) throws InterruptedException, ExecutionException, TimeoutException {
+        FutureTask<HttpResponse> futureTask = new FutureTask<>(() -> sendBrowserInner(url,refer));
+        Thread thread = new Thread(futureTask);
+        thread.start();
+        try {
+            return futureTask.get(3, TimeUnit.MINUTES);
+        }finally {
+            if(thread.isAlive()){
+                //logger.info("clear thread!");
+                thread.interrupt();
+            }
+        }
+    }
+
+    public HttpResponse sendBrowserInner(String url,String refer) {
         String domainName = null;
         try {
             domainName = AppUtils.extraDomain(url);
@@ -143,7 +157,7 @@ public class JoddHttp {
         return USER_AGENTS[idx];
     }
 
-    private void test1(){
+    private void test1() throws InterruptedException, ExecutionException, TimeoutException {
         String url = "https://m.xiaoshuoli.com/ph/week_1.html";
         HttpResponse response = sendBrowser(url, url);
         System.out.println(response);
