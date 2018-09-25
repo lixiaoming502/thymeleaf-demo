@@ -128,7 +128,10 @@ public class XslCrawler extends AbstractCrawler{
     private String extratPageConent(String cssQueryContent, String respone2) {
         Document doc2 = Jsoup.parse(respone2);
         Elements items2 = doc2.select(cssQueryContent);
-        String content2 = items2.get(0).html();
+        String content2 = "";
+        if(items2!=null&&items2.size()>1){
+            content2 = items2.get(0).html();
+        }
         return content2;
     }
 

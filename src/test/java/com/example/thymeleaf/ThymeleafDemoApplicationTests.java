@@ -140,29 +140,14 @@ public class ThymeleafDemoApplicationTests {
 		chapterContentCallBackCroner.work();
 	}
 
+
 	@Test
-	public void test_baiduBrother() throws UnsupportedEncodingException, InterruptedException, ExecutionException, TimeoutException {
+	public void test_baiduBrother2() throws UnsupportedEncodingException, InterruptedException, ExecutionException, TimeoutException {
 		String title = "满城东风许佳人";
 		List<String> pureLst = baiduBrother.loadPureChpLst(12);
 		List<Pair> all = new ArrayList<>();
 		SearchResultPage r = baiduBrother.search(title);
 		if(r.getResultItems().size()>0){
-			cc(pureLst, all, r);
-
-			System.out.println("=================next page1================"+r.getResultItems().size());
-			r = baiduBrother.searchNextFromURL(r.getNextPage());
-			cc(pureLst, all, r);
-
-			System.out.println("=================next page2================"+r.getResultItems().size());
-			r = baiduBrother.searchNextFromURL(r.getNextPage());
-			cc(pureLst, all, r);
-
-			System.out.println("=================next page3================"+r.getResultItems().size());
-			r = baiduBrother.searchNextFromURL(r.getNextPage());
-			cc(pureLst, all, r);
-
-			System.out.println("=================next page4================"+r.getResultItems().size());
-			r = baiduBrother.searchNextFromURL(r.getNextPage());
 			cc(pureLst, all, r);
 		}
 
@@ -174,6 +159,16 @@ public class ThymeleafDemoApplicationTests {
 		});
 		//String url = r.getResultItems().get(0);
 		//System.out.println("select:"+url);
+
+	}
+
+	@Test
+	public void test_baiduBrother() throws UnsupportedEncodingException, InterruptedException, ExecutionException, TimeoutException {
+		String title = "满城东风许佳人";
+		for(int i=0;i<10;i++){
+			SearchResultPage bb = baiduBrother.search(title);
+			System.out.println("size:"+bb.getResultItems().size());
+		}
 
 	}
 

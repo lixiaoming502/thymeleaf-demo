@@ -30,10 +30,13 @@ import java.util.concurrent.TimeoutException;
  */
 @Component
 public class BaiduBrother {
+
     private static Logger logger = LoggerFactory.getLogger(BaiduBrother.class);
 
     private String searchBaseURL = "https://www.baidu.com/s?ie=utf-8&wd=";
     private String baseURL = "https://www.baidu.com";
+    //搜索失败后最大尝试次数
+    private static final int MAX_SEARCH_COUNT = 3;
     //要比较的文本的最小长度
     private final static int TXT_MIN_LENGTH = 5;
     //最小的文本相似度
@@ -61,6 +64,17 @@ public class BaiduBrother {
     }
 
     public SearchResultPage search(String title) throws UnsupportedEncodingException, InterruptedException, ExecutionException, TimeoutException {
+        SearchResultPage searchResultPage = searchInner(title);
+        int count = 0;
+        while (searchResultPage.getResultItems().size()==0&&count< MAX_SEARCH_COUNT){
+            logger.info("try search again,count:"+count);
+            count++;
+            searchResultPage = searchInner(title);
+        }
+        return searchResultPage;
+    }
+
+    public SearchResultPage searchInner(String title) throws UnsupportedEncodingException, InterruptedException, ExecutionException, TimeoutException {
         String fullURL = searchBaseURL+ URLEncoder.encode(title,"utf8");
         HttpResponse response = joddHttp.sendBrowser(fullURL, baseURL);
         final int statusCode = response.statusCode();
@@ -235,6 +249,5 @@ public class BaiduBrother {
         }
         return similar;
     }
-
 
 }

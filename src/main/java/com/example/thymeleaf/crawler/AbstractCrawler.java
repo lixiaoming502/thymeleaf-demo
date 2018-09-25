@@ -111,21 +111,29 @@ public abstract class AbstractCrawler implements Crawler {
         }
         DriverFuture future = createDriverFuture(crawlerId, url);
         if(future.isDone()) {
-            String respone = (String) future.getRespone();
-            Document doc = Jsoup.parse(respone);
+            if(future.getStatusCode()==200){
+                String respone = (String) future.getRespone();
+                Document doc = Jsoup.parse(respone);
 
-            Elements items = doc.select(cssQuery);
-            Element content = items.get(0);
-            String htmlContent = content.html();
-            try {
-                futureCrawlerService.finish(crawlerId,"F",htmlContent);
-                return true;
-            } catch (IOException e) {
-                logger.warn("",e);
-                return false;
+                Elements items = doc.select(cssQuery);
+                Element content = items.get(0);
+                String htmlContent = content.html();
+                return markedFinished(crawlerId, htmlContent);
+            }else{
+                return updateCrawlerResponse(crawlerId, "E", "");
             }
         }
         return false;
+    }
+
+    private boolean markedFinished(int crawlerId, String htmlContent) {
+        try {
+            futureCrawlerService.finish(crawlerId,"F",htmlContent);
+            return true;
+        } catch (IOException e) {
+            logger.warn("",e);
+            return false;
+        }
     }
 
     protected boolean parseLevel2(int crawlerId, String url, String cssQuery,String rootURL) {
@@ -134,36 +142,34 @@ public abstract class AbstractCrawler implements Crawler {
         }
         DriverFuture future = createDriverFuture(crawlerId, url);
         if(future.isDone()) {
-            String respone = (String) future.getRespone();
-            Document doc = Jsoup.parse(respone);
+            if(future.getStatusCode()==200){
+                String respone = (String) future.getRespone();
+                Document doc = Jsoup.parse(respone);
 
-            Elements items = doc.select(cssQuery);
-            JSONArray jsonArray = new JSONArray();
-            int seqId = 0;
-            for (Element item : items) {
-                String href  = item.attr("href");
-                if(href.startsWith("#")){
-                    continue;
+                Elements items = doc.select(cssQuery);
+                JSONArray jsonArray = new JSONArray();
+                int seqId = 0;
+                for (Element item : items) {
+                    String href  = item.attr("href");
+                    if(href.startsWith("#")){
+                        continue;
+                    }
+                    if(!isMatch(href)){
+                        logger.info("unmatched ["+href+"]");
+                        continue;
+                    }
+                    seqId++;
+                    String title = item.text();
+                    String chapTitle = extractChapTitle(title);
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("href",rootURL+href);
+                    jsonObject.put("seqId",seqId);
+                    jsonObject.put("chapTitle",chapTitle);
+                    jsonArray.add(jsonObject);
                 }
-                if(!isMatch(href)){
-                    logger.info("unmatched ["+href+"]");
-                    continue;
-                }
-                seqId++;
-                String title = item.text();
-                String chapTitle = extractChapTitle(title);
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("href",rootURL+href);
-                jsonObject.put("seqId",seqId);
-                jsonObject.put("chapTitle",chapTitle);
-                jsonArray.add(jsonObject);
-            }
-            try {
-                futureCrawlerService.finish(crawlerId,"F",jsonArray.toJSONString());
-                return true;
-            } catch (IOException e) {
-                logger.warn("",e);
-                return false;
+                return markedFinished(crawlerId, jsonArray.toJSONString());
+            }else{
+                return updateCrawlerResponse(crawlerId, "E", "");
             }
         }
         return false;

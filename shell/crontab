@@ -1,0 +1,2 @@
+## 此处start包含定时检测的功能
+*/10 * * * * cd /usr/local/product/ ; ./service.sh start prod

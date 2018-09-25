@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -174,11 +175,27 @@ public class JoddHttp {
         System.out.println("["+response.body()+"]");
     }
 
+    private void test3()  {
+        String url = "https://www.aikantxt.la/content.php";
+        //nbid=610&crid=11622741&fid=fb96549631c835eb239cd614cc6b5cb7d295121a
+        Map queryMap = new HashMap();
+        queryMap.put("nbid","610");
+        queryMap.put("crid","11622741");
+        queryMap.put("fid","fb96549631c835eb239cd614cc6b5cb7d295121a");
+        HttpResponse response = sendBrowserByPost(url, url,queryMap);
+        byte[] resp = response.bodyBytes();
+        try {
+            System.out.println("["+new String(resp,"GBK")+"]");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     public static void main(String[] args) throws MalformedURLException {
         JoddHttp joddHttp = new JoddHttp();
-        joddHttp.test2();
+        joddHttp.test3();
 
     }
 }
