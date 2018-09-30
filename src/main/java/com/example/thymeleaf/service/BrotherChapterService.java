@@ -28,6 +28,13 @@ public class BrotherChapterService {
         return null;
     }
 
+    public List<BrotherChapter> queryByBrotherId(int brotherId) {
+        BrotherChapterExample brotherChapterExample = new BrotherChapterExample();
+        brotherChapterExample.createCriteria().andBrotherIdEqualTo(brotherId);
+        List<BrotherChapter> lst = brotherChapterMapper.selectByExample(brotherChapterExample);
+        return lst;
+    }
+
     public int getMaxSeqId(Integer brotherId) {
         int pageNum = 1;
         int pageSize = 1;
@@ -44,6 +51,10 @@ public class BrotherChapterService {
 
     public int addRecord(BrotherChapter chapter) {
         return brotherChapterMapper.insert(chapter);
+    }
+
+    public void update(BrotherChapter chapter){
+        brotherChapterMapper.updateByPrimaryKey(chapter);
     }
 
     public List<BrotherChapter> queryByChapterId(int chapterId){

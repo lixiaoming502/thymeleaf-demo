@@ -8,7 +8,7 @@
     <!--mvn org.mybatis.generator:mybatis-generator-maven-plugin:1.3.1:generate-->
     <context id="DB2Tables" targetRuntime="MyBatis3">
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://localhost:3306/ebook?useUnicode=true&amp;characterEncoding=UTF-8"
+                        connectionURL="jdbc:mysql://localhost:3306/crawler?useUnicode=true&amp;characterEncoding=UTF-8"
                         userId="root"
                         password="lxm2214">
         </jdbcConnection>
@@ -37,7 +37,7 @@
 
         <!--<table schema="" tableName="dt_weibo_word_tag" domainObjectName="Book"></table>-->
         <!--<table schema="" tableName="t_clusters_results"></table>-->
-        <table schema="" tableName="t_future_crawler" domainObjectName="FutureCrawler"></table>
+        <!--<table schema="" tableName="t_future_crawler" domainObjectName="FutureCrawler"></table>
         <table schema="" tableName="t_future_page_loader" domainObjectName="FuturePageLoader"></table>
         <table schema="" tableName="t_future_crawler_cfg" domainObjectName="FutureCrawlerCfg"></table>
         <table schema="" tableName="t_seeds" domainObjectName="Seed"></table>
@@ -45,7 +45,8 @@
         <table schema="" tableName="t_chapter" domainObjectName="Chapter"></table>
         <table schema="" tableName="t_brother" domainObjectName="Brother"></table>
         <table schema="" tableName="t_brother_chapter" domainObjectName="BrotherChapter"></table>
-        <table schema="" tableName="t_schedule_task" domainObjectName="ScheduleTask"></table>
+        <table schema="" tableName="t_schedule_task" domainObjectName="ScheduleTask"></table>-->
+        <table schema="" tableName="t_wooniu_syn_ids" domainObjectName="WooniuSynId"></table>
 
     </context>
 </generatorConfiguration>

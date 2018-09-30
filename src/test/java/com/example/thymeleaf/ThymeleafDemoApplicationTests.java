@@ -61,6 +61,9 @@ public class ThymeleafDemoApplicationTests {
 	@Autowired
 	private BaiduBrother baiduBrother;
 
+	@Autowired
+	private WooniuSynCroner wooniuSynCroner;
+
 
 	@Test
 	public void contextLoads() {
@@ -170,6 +173,11 @@ public class ThymeleafDemoApplicationTests {
 			System.out.println("size:"+bb.getResultItems().size());
 		}
 
+	}
+
+	@Test
+	public void test_wooniuSynCroner(){
+		wooniuSynCroner.work();
 	}
 
 	private void cc(List<String> pureLst, List<Pair> all, SearchResultPage r) {

@@ -36,8 +36,8 @@ public class FutureCrawlerCallBackCroner {
 
     private void callback(FutureCrawler futureCrawler) {
         int crawlerId = futureCrawler.getId();
-
         String beanName = futureCrawler.getCallbackBean();
+        logger.info("callback crawlerId ["+crawlerId+"],beanName ["+beanName+"]");
         CallBack callBackBean = (CallBack) ApplicationContextProvider.getBean(beanName);
         try{
             callBackBean.callback(futureCrawler.getCallbackLevel(),crawlerId);

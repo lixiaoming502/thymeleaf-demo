@@ -34,6 +34,10 @@ public class ArticleService {
         return null;
     }
 
+    public Article selectByPrimary(int articleId){
+        return articleMapper.selectByPrimaryKey(articleId);
+    }
+
     public int update(Article article) {
         return articleMapper.updateByPrimaryKeySelective(article);
     }

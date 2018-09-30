@@ -56,7 +56,7 @@ public class CronInterceptor {
                 for(Thread key:keys){
                     long t1 = holds.get(key);
                     final long timeEclipse = System.currentTimeMillis() - t1;
-                    if(timeEclipse >5*ONE_MINUTE){
+                    if(timeEclipse >30*ONE_MINUTE){
                         StackTraceElement[] trace = key.getStackTrace();
                         StringBuffer traceinfo = AppUtils.getStackBuffer(trace);
                         logger.warn("timeEclipse ["+timeEclipse+"] key ["+key.getId()+"]");

@@ -28,7 +28,7 @@ public class SqlHelper {
         postMap.put("querySql",sql);
         postMap.put("tagTime",tageTime);
         postMap.put("expMd5",expMd5);
-        String base = "http://getlove.xyz/tools/sec_sql_proxy.php";
+        String base = "http://bquant.xyz/tools/sec_sql_proxy.php";
         HttpRequest httpRequest = HttpRequest.post(base);
         httpRequest.form(postMap);
         final byte[] bytes = httpRequest.send().bodyBytes();
@@ -59,7 +59,7 @@ public class SqlHelper {
             Object value = params.get(column);
             if(value instanceof String){
                 values.append("'");
-                values.append(value);
+                values.append(escapeInput((String) value));
                 values.append("',");
             }else if(value instanceof Date){
                 String date = TimeUtils.getDate((Date)value,TimeUtils.FULL_TIME_FORMAT_NO_SPLIT);
@@ -67,6 +67,11 @@ public class SqlHelper {
                 values.append(date);
                 values.append("',");
             }else if(value instanceof Integer){
+                values.append(value);
+                values.append(",");
+            }else if (value==null){
+                values.append("NULL,");
+            }else {
                 values.append(value);
                 values.append(",");
             }
@@ -77,6 +82,13 @@ public class SqlHelper {
         values.append(")");
         buffer.append(values);
         return buffer.toString();
+    }
+
+    private static String escapeInput(String input){
+        if(input.contains("'")){
+            input = input.replace("'","\\'");
+        }
+        return input;
     }
 
     //UPDATE  `u342382313_mydb`.`t_store_msg` SET  `msg_content` =  'testmsgcontent2' WHERE  `t_store_msg`.`msg_id` =2;
@@ -185,7 +197,8 @@ public class SqlHelper {
     }
 
     public static void main(String[] args) throws Exception {
-        String sql = "select * FROM `t_article` WHERE `status`=0 order by id limit 0,10";
+        String sql = "select title,click_times from t_article order by click_times desc limit 10";
+        //String sql = "delete  from `t_chapter`  ";
         String result = SqlHelper.proxySql(sql);
         System.out.println("["+result+"]");
         JSONArray jsonArray = JSONArray.parseArray(result);

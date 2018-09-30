@@ -33,6 +33,14 @@ public class BrotherService {
         return lst;
     }
 
+    public List<Brother> selectByArticleId(int articleId){
+        BrotherExample brotherExample = new BrotherExample();
+        brotherExample.createCriteria().andArticleIdEqualTo(articleId);
+        brotherExample.setOrderByClause("brother_id");
+        List<Brother> lst = brotherMapper.selectByExample(brotherExample);
+        return lst;
+    }
+
     public int update(Brother record){
         return brotherMapper.updateByPrimaryKey(record);
     }

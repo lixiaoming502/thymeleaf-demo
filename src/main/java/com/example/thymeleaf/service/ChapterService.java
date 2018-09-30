@@ -63,13 +63,26 @@ public class ChapterService {
         return lst;
     }
 
+    public List<Chapter> selectByArticleIdSeqId(int articleId,int seqId) {
+        int pageNum = 1;
+        int pageSize = 100;
+        PageHelper.startPage(pageNum, pageSize);
+        ChapterExample chapterExample = new ChapterExample();
+        final ChapterExample.Criteria criteria = chapterExample.createCriteria();
+        criteria.andArtileIdEqualTo(articleId);
+        criteria.andSeqIdGreaterThan(seqId);
+        chapterExample.setOrderByClause("seq_id ");
+        List<Chapter> lst = chapterMapper.selectByExample(chapterExample);
+        return lst;
+    }
+
     public List<Chapter> getToBeCrawl() {
         int pageNum = 1;
         int pageSize = 10;
         PageHelper.startPage(pageNum, pageSize);
         ChapterExample chapterExample = new ChapterExample();
         chapterExample.createCriteria().andCollectFlagEqualTo(false);
-        chapterExample.setOrderByClause("id ");
+        chapterExample.setOrderByClause("artile_id,seq_id,id ");
         List<Chapter> lst = chapterMapper.selectByExample(chapterExample);
         return lst;
     }

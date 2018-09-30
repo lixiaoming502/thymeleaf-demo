@@ -132,7 +132,11 @@ public class T1 {
         //t1.testDecodeBase64();
         //t1.genSql();
         //t1.sortJson();
-        t1.isMatch();
+        String s1 ="i don't know";
+        if(s1.contains("'")){
+            s1 = s1.replace("'","\\'");
+            System.out.println(s1);
+        }
 
 
     }

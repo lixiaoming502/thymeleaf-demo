@@ -81,6 +81,7 @@ public class ArticleCallBack extends AbstractCallBack{
     }
 
     protected void callback_level2(int crawlerId) {
+        logger.info("callback_level2 entry,crawlerId "+crawlerId);
         FutureCrawler record = futureCrawlerService.queryByCrawlerId(crawlerId);
         JSONArray jsonArray = parseToJsonArray(record);
         Article exist = articleService.queryByListURL(record.getPageUrl());
@@ -89,6 +90,7 @@ public class ArticleCallBack extends AbstractCallBack{
 
         //JSONArray排序
         List<JSONObject> lst = parseToList(jsonArray);
+        logger.info("list size "+lst.size());
 
         for(JSONObject info:lst) {
             int seqId = info.getInteger("seqId");
