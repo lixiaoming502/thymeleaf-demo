@@ -35,7 +35,7 @@ public class SynBrotherChapterId {
             List<BrotherChapter> brotherChapters = brotherChapterService.queryByBrotherId(brother.getBrotherId());
             brotherChapters.forEach(brotherChapter -> {
                 int chapterId = findChapterId(brotherChapter.getTitle(),articleId);
-                brotherChapter.setBrotherId(chapterId);
+                brotherChapter.setChapterId(chapterId);
                 brotherChapterService.update(brotherChapter);
             });
         });

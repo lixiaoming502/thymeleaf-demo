@@ -128,7 +128,16 @@ public class WooniuSynCroner {
 
         String sql = SqlHelper.insertTable("t_chapter", params);
         String result = SqlHelper.proxySql(sql);
-        if(result.contains("error")&&!result.contains("Duplicate")){
+        if(result.contains("Duplicate")){
+            Map<String,Object> setMap = new HashMap<>();
+            Map<String,Object> whereMap = new HashMap<>();
+            setMap.put("local_url",chapter.getLocalUrl());
+            whereMap.put("id",chapter.getId());
+            sql = SqlHelper.updateTable("t_chapter",setMap,whereMap);
+            logger.info("update-sql:"+sql);
+            result = SqlHelper.proxySql(sql);
+            logger.info("update-result:"+result);
+        }else if(result.contains("error")){
             throw new RuntimeException("插入数据异常，chapter_id "+chapter.getId()+" remote result:"+result);
         }
     }

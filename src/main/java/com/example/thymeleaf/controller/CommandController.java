@@ -1,5 +1,6 @@
 package com.example.thymeleaf.controller;
 
+import com.example.thymeleaf.cron.ChapterContentCallBackCroner;
 import com.example.thymeleaf.service.SynBrotherChapterId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +24,14 @@ public class CommandController {
     @Autowired
     private SynBrotherChapterId synBrotherChapterId;
 
+    @Autowired
+    private ChapterContentCallBackCroner chapterContentCallBackCroner;
+
     @RequestMapping("/list")
     public List<String> list() {
         List<String> cmds  = new ArrayList<>();
         cmds.add("/sysn_brother_chapterid/{article_id}");
+        cmds.add("/recrawl/{article_id}");
         return cmds;
     }
 
@@ -38,6 +43,18 @@ public class CommandController {
     public String sysnBrotherChapterId(@PathVariable("article_id") int articleId) {
         try{
             synBrotherChapterId.sysChapterId(articleId);
+        }catch (Exception e){
+            logger.warn("",e);
+            return "ERROR";
+        }
+        return "OK";
+    }
+
+    @RequestMapping(value = "/recrawl/{article_id}",method= RequestMethod.GET, produces="application/json")
+    public String reCrawlArticle(@PathVariable("article_id") int articleId) {
+        try{
+            logger.info("reCrawlArticle "+articleId);
+            chapterContentCallBackCroner.recrawl(articleId);
         }catch (Exception e){
             logger.warn("",e);
             return "ERROR";

@@ -129,7 +129,7 @@ public class XslCrawler extends AbstractCrawler{
         Document doc2 = Jsoup.parse(respone2);
         Elements items2 = doc2.select(cssQueryContent);
         String content2 = "";
-        if(items2!=null&&items2.size()>1){
+        if(items2!=null&&items2.size()>0){
             content2 = items2.get(0).html();
         }
         return content2;

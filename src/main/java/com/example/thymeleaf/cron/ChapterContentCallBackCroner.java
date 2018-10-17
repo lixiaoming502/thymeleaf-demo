@@ -57,6 +57,13 @@ public class ChapterContentCallBackCroner {
         logger.info("ChapterContentCallBackCroner end");
     }
 
+    public void recrawl(int articleId){
+        List<Chapter> lst = chapterService.selectAllByArticleId(articleId);
+        for(Chapter chapter:lst){
+            updateChapter(chapter);
+        }
+    }
+
     private void updateChapter(Chapter chapter) {
         int chapterId = chapter.getId();
         String url = chapter.getUrl();

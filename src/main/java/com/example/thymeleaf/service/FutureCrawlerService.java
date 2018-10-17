@@ -113,4 +113,16 @@ public class FutureCrawlerService {
         criteria.andCrawlerStateEqualTo("A");
         return futureCrawlerMapper.countByExample(example);
     }
+
+    public FutureCrawler queryByRefId(int refId){
+        FutureCrawlerExample example = new FutureCrawlerExample();
+        FutureCrawlerExample.Criteria criteria = example.createCriteria();
+        criteria.andRefIdEqualTo(refId);
+        List<FutureCrawler> lst = futureCrawlerMapper.selectByExample(example);
+        if(CollectionUtils.isNotEmpty(lst)){
+            return lst.get(0);
+        }else{
+            return null;
+        }
+    }
 }

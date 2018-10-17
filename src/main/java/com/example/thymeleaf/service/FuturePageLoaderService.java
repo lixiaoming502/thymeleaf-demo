@@ -167,5 +167,12 @@ public class FuturePageLoaderService {
             return lst.get(0);
         }
     }
+
+    public List<FuturePageLoader> getByCrawlerId(int crawlerId) {
+        FuturePageLoaderExample example = new FuturePageLoaderExample();
+        FuturePageLoaderExample.Criteria criteria = example.createCriteria();
+        criteria.andCrawlerIdEqualTo(crawlerId);
+        return futurePageLoaderMapper.selectByExample(example);
+    }
 }
 

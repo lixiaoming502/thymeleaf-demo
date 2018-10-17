@@ -196,7 +196,20 @@ public class SqlHelper {
         return null;
     }
 
-    public static void main(String[] args) throws Exception {
+    private static void clearArticle(int article_id){
+        try {
+            String sql = "delete from t_article where id="+article_id;
+            String result = SqlHelper.proxySql(sql);
+            System.out.println("["+result+"]");
+            sql="delete from t_chapter where artile_id="+article_id;
+            result = SqlHelper.proxySql(sql);
+            System.out.println("["+result+"]");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void selectDemo() throws Exception {
         String sql = "select title,click_times from t_article order by click_times desc limit 10";
         //String sql = "delete  from `t_chapter`  ";
         String result = SqlHelper.proxySql(sql);
@@ -204,6 +217,19 @@ public class SqlHelper {
         JSONArray jsonArray = JSONArray.parseArray(result);
         for(Object jsonObject:jsonArray){
             System.out.println("AAA:"+jsonObject);
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        int caseId = 1;
+        switch (caseId){
+            case 0:
+                selectDemo();
+                break;
+            case 1:
+                int articleId = 1265;
+                clearArticle(articleId);
+                break;
         }
     }
 }

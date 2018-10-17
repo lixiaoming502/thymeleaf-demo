@@ -63,6 +63,14 @@ public class ChapterService {
         return lst;
     }
 
+    public List<Chapter> selectAllByArticleId(int articleId) {
+        ChapterExample chapterExample = new ChapterExample();
+        chapterExample.createCriteria().andArtileIdEqualTo(articleId);
+        chapterExample.setOrderByClause("id ");
+        List<Chapter> lst = chapterMapper.selectByExample(chapterExample);
+        return lst;
+    }
+
     public List<Chapter> selectByArticleIdSeqId(int articleId,int seqId) {
         int pageNum = 1;
         int pageSize = 100;

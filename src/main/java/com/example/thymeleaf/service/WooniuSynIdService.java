@@ -18,6 +18,8 @@ public class WooniuSynIdService {
 
     private static final Integer COMPLETE = 1;
     private static final Integer NORMAL = 0;
+    //在原status基础上加10，表示已经做过清除crawler.txt的操作
+    private static final Integer CLEAR = 10;
     private static final Integer ERROR = 2;
 
     @Autowired
@@ -27,6 +29,19 @@ public class WooniuSynIdService {
         WooniuSynIdExample exmaple = new WooniuSynIdExample();
         WooniuSynIdExample.Criteria criteria = exmaple.createCriteria();
         criteria.andStatusEqualTo(NORMAL);
+        exmaple.setOrderByClause("id");
+        List<WooniuSynId> lst = wooniuSynIdMapper.selectByExample(exmaple);
+        if(CollectionUtils.isNotEmpty(lst)){
+            return lst.get(0);
+        }else{
+            return null;
+        }
+    }
+
+    public WooniuSynId getOneToBeClear(){
+        WooniuSynIdExample exmaple = new WooniuSynIdExample();
+        WooniuSynIdExample.Criteria criteria = exmaple.createCriteria();
+        criteria.andStatusEqualTo(COMPLETE);
         exmaple.setOrderByClause("id");
         List<WooniuSynId> lst = wooniuSynIdMapper.selectByExample(exmaple);
         if(CollectionUtils.isNotEmpty(lst)){
@@ -47,6 +62,11 @@ public class WooniuSynIdService {
 
     public void updateComplete(WooniuSynId wooniuSynId){
         wooniuSynId.setStatus(COMPLETE);
+        wooniuSynIdMapper.updateByPrimaryKey(wooniuSynId);
+    }
+
+    public void updateClear(WooniuSynId wooniuSynId){
+        wooniuSynId.setStatus(wooniuSynId.getStatus()+CLEAR);
         wooniuSynIdMapper.updateByPrimaryKey(wooniuSynId);
     }
 
