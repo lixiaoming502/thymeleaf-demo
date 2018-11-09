@@ -9,7 +9,9 @@ import com.example.thymeleaf.service.WooniuSynIdService;
 import com.example.thymeleaf.util.SqlHelper;
 import jodd.http.HttpRequest;
 import jodd.http.HttpResponse;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,10 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
@@ -66,12 +66,50 @@ public class WooniuSynCroner {
         }
     }
 
+    private boolean articleHealth(int articleId){
+        List<Chapter> lst = chapterService.selectAllByArticleId(articleId);
+        HashSet<String> md5 = new HashSet<String>();
+        for(Chapter chapter:lst){
+            if(CollectionUtils.isEmpty(lst)){
+                logger.info("article_chapter is empty");
+                return false;
+            }
+            String localUrl = chapter.getLocalUrl();
+            if(StringUtils.isEmpty(localUrl)||!localUrl.startsWith("data")){
+                return false;
+            }
+            File file = new File(localUrl);
+            if(file.length() < 10){
+                return false;
+            }
+            try {
+                String content = FileUtils.readFileToString(file, "utf-8");
+                String md5Hex = DigestUtils.md5Hex(content);
+                if(md5.contains(md5Hex)){
+                    logger.warn("md5 duplicate!");
+                    return false;
+                }else{
+                    md5.add(md5Hex);
+                }
+            } catch (IOException e) {
+                logger.warn("",e);
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void syn(WooniuSynId toBeSyn) {
         Integer articleId = toBeSyn.getArticleId();
         logger.info("syn "+articleId);
         Integer pos = toBeSyn.getPos();
         try{
             if(pos==null||pos==0){
+                if(!articleHealth(articleId)){
+                    logger.warn("article "+articleId+" health check false!!!");
+                    wooniuSynIdService.updateError(toBeSyn);
+                    return;
+                }
                 synArticle(articleId);
                 pos=-1;
                 wooniuSynIdService.updatePos(toBeSyn,pos);

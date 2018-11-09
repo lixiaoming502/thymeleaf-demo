@@ -76,7 +76,7 @@ public class ChapterContentCallBackCroner {
             });
         }
        String seleURL =  selectByQueueSize(urls);
-        logger.info("seleURL:"+seleURL);
+        logger.info("seleURL:"+seleURL+" chapterId."+chapterId);
        FutureCrawlerCfg futureCrawlerCfg = queryByUrl(seleURL);
         int level = 3;
         String crawlerState = "A";
@@ -113,7 +113,7 @@ public class ChapterContentCallBackCroner {
         try {
             domainName = AppUtils.extraDomain(url);
         } catch (MalformedURLException e) {
-            logger.warn("",e);
+            logger.warn("illegal url."+url,e);
             return null;
         }
         FutureCrawlerCfg cfg = futureCrawlerCfgService.queryByDomain(domainName);

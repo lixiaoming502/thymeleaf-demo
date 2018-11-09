@@ -180,6 +180,7 @@ public abstract class AbstractCrawler implements Crawler {
 
     protected boolean updateCrawlerResponse(int crawlerId, String crawlerState,String response) {
         try {
+            logger.info("updateCrawlerResponse,crawler_id,"+crawlerId);
             futureCrawlerService.finish(crawlerId,crawlerState,response);
             return true;
         } catch (IOException e) {

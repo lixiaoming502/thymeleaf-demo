@@ -4,6 +4,7 @@ import com.example.thymeleaf.crawler.AbstractCrawler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.*;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -101,5 +102,35 @@ public class AppUtils {
     public static void main(String[] args) {
         String input = "844章 派你做第一任爪哇总督";
         System.out.println(Integer.parseInt(AppUtils.getNumbers(input)));
+    }
+
+    public static void writeObject(Object request,String filename) {
+        ObjectOutputStream out;
+        try {
+            out = new ObjectOutputStream(new FileOutputStream("data/"+filename+"-request.ser"));
+            out.writeObject(request);
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * 测试用
+     */
+    public static Object readObject(String filename) {
+        ObjectInputStream in;
+        File f = new File("data/"+filename+"-request.ser");
+        if (!f.exists())
+            return null;
+        try {
+            in = new ObjectInputStream(new FileInputStream("data/"+filename+"-request.ser"));
+            Object ret = in.readObject();
+            in.close();
+            return ret;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+
     }
 }

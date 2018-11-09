@@ -34,7 +34,7 @@ public class FutureCrawlerCallBackCroner {
         logger.info("FutureCrawlerCallBackCroner end");
     }
 
-    private void callback(FutureCrawler futureCrawler) {
+    public void callback(FutureCrawler futureCrawler) {
         int crawlerId = futureCrawler.getId();
         String beanName = futureCrawler.getCallbackBean();
         logger.info("callback crawlerId ["+crawlerId+"],beanName ["+beanName+"]");

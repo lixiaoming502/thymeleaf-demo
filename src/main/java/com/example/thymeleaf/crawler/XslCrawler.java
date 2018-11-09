@@ -82,6 +82,9 @@ public class XslCrawler extends AbstractCrawler{
             return false;
         }
         DriverFuture future = createDriverFuture(crawlerId, url);
+        if(future.getStatusCode()!=200){
+            return updateCrawlerResponse(crawlerId, "E", "");
+        }
         if(future.isDone()) {
             String respone = (String) future.getRespone();
             Document doc = Jsoup.parse(respone);

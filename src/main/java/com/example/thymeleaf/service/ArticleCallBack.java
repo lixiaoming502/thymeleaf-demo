@@ -2,6 +2,7 @@ package com.example.thymeleaf.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.example.thymeleaf.cron.ByStanderWooniuSynCroner;
 import com.example.thymeleaf.model.Article;
 import com.example.thymeleaf.model.Chapter;
 import com.example.thymeleaf.model.FutureCrawler;
@@ -25,6 +26,9 @@ public class ArticleCallBack extends AbstractCallBack{
 
     @Autowired
     private ChapterService chapterService;
+
+    @Autowired
+    private ByStanderWooniuSynCroner byStanderWooniuSynCroner;
 
 
     protected void callback_level1(int crawlerId) {
@@ -78,6 +82,7 @@ public class ArticleCallBack extends AbstractCallBack{
         }
         chapter.setLocalUrl(record.getResponse());
         chapterService.update(chapter);
+        byStanderWooniuSynCroner.synArticleIDMap(chapter.getArtileId());
     }
 
     protected void callback_level2(int crawlerId) {

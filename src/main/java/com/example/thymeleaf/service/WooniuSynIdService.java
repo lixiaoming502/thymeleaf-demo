@@ -25,6 +25,10 @@ public class WooniuSynIdService {
     @Autowired
     private WooniuSynIdMapper wooniuSynIdMapper;
 
+    public void add(WooniuSynId wooniuSynId){
+        wooniuSynIdMapper.insert(wooniuSynId);
+    }
+
     public WooniuSynId getOneToBeSyn(){
         WooniuSynIdExample exmaple = new WooniuSynIdExample();
         WooniuSynIdExample.Criteria criteria = exmaple.createCriteria();
@@ -37,6 +41,19 @@ public class WooniuSynIdService {
             return null;
         }
     }
+
+    public WooniuSynId selectByArticleId(int articleId){
+        WooniuSynIdExample exmaple = new WooniuSynIdExample();
+        WooniuSynIdExample.Criteria criteria = exmaple.createCriteria();
+        criteria.andArticleIdEqualTo(articleId);
+        List<WooniuSynId> lst = wooniuSynIdMapper.selectByExample(exmaple);
+        if(CollectionUtils.isNotEmpty(lst)){
+            return lst.get(0);
+        }else{
+            return null;
+        }
+    }
+
 
     public WooniuSynId getOneToBeClear(){
         WooniuSynIdExample exmaple = new WooniuSynIdExample();

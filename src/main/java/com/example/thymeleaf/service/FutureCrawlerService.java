@@ -25,15 +25,13 @@ public class FutureCrawlerService {
     @Autowired
     private FutureCrawlerMapper futureCrawlerMapper ;
 
-    @Deprecated
-    public List<FutureCrawler> getToBeCrawl(){
-        //使用分页插件,核心代码就这一行
+    public List<FutureCrawler> queryAllToBeCrawler(){
         int pageNum = 1;
-        int pageSize = 10;
+        int pageSize = 1000;
         PageHelper.startPage(pageNum, pageSize);
         FutureCrawlerExample example = new FutureCrawlerExample();
         FutureCrawlerExample.Criteria criteria = example.createCriteria();
-        criteria.andCrawlerStateNotEqualTo("F");
+        criteria.andCrawlerStateEqualTo("A");
         //example.setOrderByClause("domain_id,id");
         return futureCrawlerMapper.selectByExample(example);
     }

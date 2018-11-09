@@ -126,4 +126,8 @@ public class ChapterService {
     public Chapter queryById(Integer refId) {
         return chapterMapper.selectByPrimaryKey(refId);
     }
+
+    public void delete(Integer id) {
+        chapterMapper.deleteByPrimaryKey(id);
+    }
 }

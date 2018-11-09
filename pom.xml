@@ -131,6 +131,26 @@
 
 	<build>
 		<plugins>
+
+			<!--<plugin>
+				<groupId>cn.zhonggu.utopay.plugin</groupId>
+				<artifactId>versionTag</artifactId>
+				<version>1.0-SNAPSHOT</version>
+				<configuration>
+					<basePackage>com.example.thymeleaf</basePackage>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>count line number</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>versionTag</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>-->
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

@@ -46,11 +46,13 @@ public class DefaultSelfDriver implements SelfDriver {
                 try {
                     //final String charset = getCharset(driverFuture.getDomainId());
                     content = FileUtils.readFileToString(file, "UTF8");
+                    driverFuture.setRespone(content);
+                    driverFuture.setStatusCode(futurePageLoader.getStateCode());
                 } catch (IOException e) {
                     logger.warn("",e);
+                    driverFuture.setStatusCode(500);
                 }
-                driverFuture.setRespone(content);
-                driverFuture.setStatusCode(futurePageLoader.getStateCode());
+
             }
         }
         return driverFuture;

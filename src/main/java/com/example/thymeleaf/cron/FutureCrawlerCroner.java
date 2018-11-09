@@ -48,24 +48,30 @@ public class FutureCrawlerCroner {
         logger.info("FutureCrawlerCroner end");
     }
 
-    private void crawl(FutureCrawler futureCrawler) {
+    public void crawl(FutureCrawler futureCrawler) {
         int crawlerId = futureCrawler.getId();
         int seedId = futureCrawler.getSeedId();
         int level = futureCrawler.getLevel();
         String url = futureCrawler.getPageUrl();
+        logger.info("crawler "+crawlerId);
         try{
             String beanName = seedsService.getBeanName(seedId);
             Crawler crawler = (Crawler) ApplicationContextProvider.getBean(beanName);
             boolean parsed  = crawler.parse(level,crawlerId,futureCrawler.getDomainId(),url);
             if(!parsed) {
-                futureCrawler.setCrawlerState("P");
-                futureCrawler.setUpdateTime(new Date());
-                futureCrawlerService.update(futureCrawler);
+                updateFutureCrawler(futureCrawler,"P");
             }
         }catch (Exception e){
-            logger.warn("failed crawl "+crawlerId,e);
+            logger.info("failed crawl "+crawlerId,e);
+            updateFutureCrawler(futureCrawler,"E");
         }
 
+    }
+
+    private void updateFutureCrawler(FutureCrawler futureCrawler,String state) {
+        futureCrawler.setCrawlerState(state);
+        futureCrawler.setUpdateTime(new Date());
+        futureCrawlerService.update(futureCrawler);
     }
 
 }
