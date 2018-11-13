@@ -82,6 +82,7 @@ public class ArticleCallBack extends AbstractCallBack{
         }
         chapter.setLocalUrl(record.getResponse());
         chapterService.update(chapter);
+        logger.info("callback_level3 article_id "+chapter.getArtileId());
         byStanderWooniuSynCroner.synArticleIDMap(chapter.getArtileId());
     }
 

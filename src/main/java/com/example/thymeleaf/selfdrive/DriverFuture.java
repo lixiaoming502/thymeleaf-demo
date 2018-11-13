@@ -12,7 +12,7 @@ public class DriverFuture {
 
     private Object respone;
 
-    private int statusCode;
+    private int statusCode = 0;
 
     public DriverFuture(int crawlerId, Integer domainId, String url) {
         this.crawlerId = crawlerId;

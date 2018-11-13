@@ -39,6 +39,10 @@ public class ClearSynChapterCroner {
 
     public void work() {
         WooniuSynId record = wooniuSynIdService.getOneToBeClear();
+        if(record==null){
+            logger.info("no article need to clear");
+            return;
+        }
         final Integer articleId = record.getArticleId();
         logger.info("ClearSynChapterCroner article_id "+ articleId);
         List<Chapter> lst = chapterService.selectByArticleId(articleId);

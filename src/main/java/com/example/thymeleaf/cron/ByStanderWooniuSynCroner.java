@@ -71,18 +71,21 @@ public class ByStanderWooniuSynCroner {
 
     public void checkAndSyn(Integer articleID) {
         logger.info("checkAndSyn "+articleID);
+        if(wooniuSynIdService.selectByArticleId(articleID)!=null){
+            logger.info("wooniuSynId is not null,so not need to check!remove and return!");
+            articleIDMap.remove(articleID);
+            return;
+        }
         if(!articleIDMap.containsKey(articleID)){
            synArticleIDMap(articleID);
         }
         if(articleHealth(articleID)){
             logger.info("add article_id to wooniuSyn"+articleID);
-            if(wooniuSynIdService.selectByArticleId(articleID)==null){
-                WooniuSynId wooniuSynId = new WooniuSynId() ;
-                wooniuSynId.setArticleId(articleID);
-                wooniuSynId.setStatus(0);
-                wooniuSynId.setPos(0);
-                wooniuSynIdService.add(wooniuSynId);
-            }
+            WooniuSynId wooniuSynId = new WooniuSynId() ;
+            wooniuSynId.setArticleId(articleID);
+            wooniuSynId.setStatus(0);
+            wooniuSynId.setPos(0);
+            wooniuSynIdService.add(wooniuSynId);
             articleIDMap.remove(articleID);
         }
     }
@@ -91,6 +94,7 @@ public class ByStanderWooniuSynCroner {
         List<Chapter> lst = chapterService.selectAllByArticleId(articleId);
         HashMap<String,Integer> md5 = new HashMap<>();
         boolean ret = true;
+        int contentEmptyCount = 0,md5DupCount=0;
         for(Chapter chapter:lst){
             if(CollectionUtils.isEmpty(lst)){
                 logger.info("article_chapter is empty");
@@ -108,8 +112,15 @@ public class ByStanderWooniuSynCroner {
                 if(record==null){
                     return false;
                 }
-                logger.info("try recrawlFutureCrawler");
-                recrawlFutureCrawler(record, record.getId());
+                if(System.currentTimeMillis()-articleIDMap.get(articleId)>10*TIME_OUT){
+                    //如果超过100分钟，仍旧爬取失败，则删除之
+                    //删除后面重复的
+                    chapterService.delete(chapter.getId());
+                    contentEmptyCount++;
+                }else{
+                    logger.info("try recrawlFutureCrawler");
+                    recrawlFutureCrawler(record, record.getId());
+                }
                 ret = false;
                 continue;
             }
@@ -123,6 +134,10 @@ public class ByStanderWooniuSynCroner {
                     if(duplicateTitleDel(last_chapter_id,chapter)){
                         logger.info("duplicateTitleDel "+chapter.getId());
                         continue;
+                    }else{
+                        //删除后面重复的
+                        chapterService.delete(chapter.getId());
+                        md5DupCount++;
                     }
                     ret = false;
                 }else{
@@ -133,6 +148,7 @@ public class ByStanderWooniuSynCroner {
                 return false;
             }
         }
+        logger.info("articleID "+articleId+" md5DupCount "+md5DupCount+" contentEmptyCount "+contentEmptyCount);
         return ret;
     }
 
@@ -201,6 +217,7 @@ public class ByStanderWooniuSynCroner {
     }
 
     public void synArticleIDMap(int article_id){
+        logger.info("synArticleID "+article_id);
         long tag = System.currentTimeMillis();
         articleIDMap.put(article_id,tag);
         AppUtils.writeObject(articleIDMap,"ByStanderWooniuSynCroner");

@@ -74,6 +74,15 @@ public class BaiduBrother {
         return searchResultPage;
     }
 
+    /**
+     *
+     * @param title
+     * @return 找出一页搜索结果，或者是最多尝试3次
+     * @throws UnsupportedEncodingException
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     */
     public SearchResultPage searchInner(String title) throws UnsupportedEncodingException, InterruptedException, ExecutionException, TimeoutException {
         String fullURL = searchBaseURL+ URLEncoder.encode(title,"utf8");
         HttpResponse response = joddHttp.sendBrowser(fullURL, baseURL);

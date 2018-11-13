@@ -78,12 +78,19 @@ public class XslCrawler extends AbstractCrawler{
     protected boolean parseLevel3(int crawlerId, String url) {
         final String cssQueryNext = "#pb_next";
         final String cssQueryContent = "#chaptercontent";
+        //判断是否所有子任务都是F
         if(hasCrawlerPageWaiting(crawlerId)){
             return false;
         }
         DriverFuture future = createDriverFuture(crawlerId, url);
         if(future.getStatusCode()!=200){
-            return updateCrawlerResponse(crawlerId, "E", "");
+            logger.info("getStatusCode!=200,statusCode "+future.getStatusCode());
+            //初始状态，什么原因？判断为：子任务列表为空的情况,则需要等待子任务执行完
+            if(future.getStatusCode()==0){
+                return false;
+            }else{
+                return updateCrawlerResponse(crawlerId, "E", "");
+            }
         }
         if(future.isDone()) {
             String respone = (String) future.getRespone();
@@ -104,6 +111,7 @@ public class XslCrawler extends AbstractCrawler{
                     return updateCrawlerResponse(crawlerId, "F", s1+s2);
                 }
             }else{
+                logger.info("next page is not found!");
                 return updateCrawlerResponse(crawlerId, "E", "");
             }
         }
