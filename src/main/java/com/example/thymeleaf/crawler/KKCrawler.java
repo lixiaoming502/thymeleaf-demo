@@ -17,6 +17,10 @@ public class KKCrawler extends AbstractCrawler {
 
     private String baseUrl = "http://www.12kanshu.com";
 
+    KKCrawler(){
+        this.level3FilterWords = "看书小说网www.12kanshu.com";
+    }
+
     @Override
     protected boolean parseLevel3(int crawlerId, String url) {
         final String cssQuery = "#chapterContent p";

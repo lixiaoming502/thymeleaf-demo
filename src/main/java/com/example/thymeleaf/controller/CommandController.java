@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lixiaoming on 2018/9/30.
@@ -114,10 +116,11 @@ public class CommandController {
     }
 
     @RequestMapping(value = "/baidubrother/{article_id}",method= RequestMethod.GET, produces="application/json")
-    public String baiduBrother(@PathVariable("article_id") int articleId) throws Exception {
+    public Map baiduBrother(@PathVariable("article_id") int articleId) throws Exception {
         logger.info("baiduBrother entry!");
         Article article = articleService.selectByPrimary(articleId);
         SearchResultPage searchResultPage = baiduBrother.search(article.getTitle().trim());
+        HashMap<String,String> retMap  = new HashMap<>();
         if(searchResultPage.getResultItems().size()>0){
             List<String> pureLst = baiduBrother.loadPureChpLst(articleId);
             searchResultPage.getResultItems().forEach(url->{
@@ -126,6 +129,7 @@ public class CommandController {
                     Pair pair = baiduBrother.analysisCssSelector(url, pureLst);
                     if(pair!=null){
                         logger.info(pair.getLeft()+"|"+pair.getRight());
+                        retMap.put((String) pair.getLeft(),(String) pair.getRight());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -133,6 +137,6 @@ public class CommandController {
             });
         }
         logger.info("baiduBrother out");
-        return "OK";
+        return retMap;
     }
 }
