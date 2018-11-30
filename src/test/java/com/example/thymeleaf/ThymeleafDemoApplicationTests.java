@@ -1,6 +1,7 @@
 package com.example.thymeleaf;
 
 import com.example.thymeleaf.cron.*;
+import com.example.thymeleaf.dao.WooniuSynIdMapper;
 import com.example.thymeleaf.model.FutureCrawler;
 import com.example.thymeleaf.service.*;
 import com.example.thymeleaf.util.AppUtils;
@@ -63,6 +64,9 @@ public class ThymeleafDemoApplicationTests {
 
 	@Autowired
 	private WooniuSynCroner wooniuSynCroner;
+
+	@Autowired
+	private WooniuSynIdMapper wooniuSynIdMapper;
 
 
 	@Test
@@ -197,6 +201,13 @@ public class ThymeleafDemoApplicationTests {
 		});
 		long cost = System.currentTimeMillis()-t1;
 		System.out.println("cost "+cost );
+	}
+
+	@Test
+	public void test_wooniuSynIdMapper(){
+		System.out.println("##############################################");
+		int cnt = wooniuSynIdMapper.querySynCountByDate("20181129");
+		System.out.println("####################################cnt:"+cnt);
 	}
 
 }

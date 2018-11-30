@@ -2,6 +2,7 @@ package com.example.thymeleaf.controller;
 
 import com.example.thymeleaf.service.JoddHttp;
 import com.example.thymeleaf.service.SearchService;
+import com.example.thymeleaf.service.WooniuSynIdService;
 import jodd.http.HttpResponse;
 import jodd.util.Base64;
 import org.slf4j.Logger;
@@ -28,6 +29,9 @@ public class CrawlerController {
     @Autowired
     private SearchService biquGSearchService;
 
+    @Autowired
+    private WooniuSynIdService wooniuSynIdService;
+
     @RequestMapping("/contents/myproject1/test1.php")
     public void proxy(@RequestParam("url") String base64URL, HttpServletResponse httpServletResponse){
         String url = new String(Base64.decode(base64URL));
@@ -48,6 +52,12 @@ public class CrawlerController {
     public String search(String title) throws InterruptedException, ExecutionException, TimeoutException {
         logger.info("get title "+title);
         return biquGSearchService.search_xbq(title.trim());
+    }
+
+    @RequestMapping("/contents/myproject1/statistics.php")
+    public int statistics(String date) throws InterruptedException, ExecutionException, TimeoutException {
+        logger.info("get date "+date);
+        return wooniuSynIdService.querySynCountByDate(date.trim());
     }
 
 }

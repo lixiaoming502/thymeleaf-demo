@@ -122,6 +122,8 @@ public abstract class AbstractCrawler implements Crawler {
                 Elements items = doc.select(cssQuery);
                 Element content = items.get(0);
                 String htmlContent = content.html();
+                htmlContent = sensitiveWordsFilter(htmlContent);
+                logger.info(" html length "+htmlContent.length());
                 if(level3FilterWords!=null){
                     htmlContent = filterWords(htmlContent,level3FilterWords);
                 }
@@ -133,11 +135,17 @@ public abstract class AbstractCrawler implements Crawler {
         return false;
     }
 
+    protected abstract String sensitiveWordsFilter(String htmlContent);
+
     private boolean markedFinished(int crawlerId, String htmlContent) {
         try {
             futureCrawlerService.finish(crawlerId,"F",htmlContent);
+            if(htmlContent.trim().length()==0){
+                //throw new IllegalStateException("htmlContent length is null");
+                logger.info("htmlContent length is null crawlerId "+crawlerId);
+            }
             return true;
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.warn("",e);
             return false;
         }

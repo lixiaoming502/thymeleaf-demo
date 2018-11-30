@@ -97,4 +97,8 @@ public class WooniuSynIdService {
         wooniuSynIdMapper.updateByPrimaryKey(wooniuSynId);
     }
 
+    public int querySynCountByDate(String date){
+        return wooniuSynIdMapper.querySynCountByDate(date);
+    }
+
 }

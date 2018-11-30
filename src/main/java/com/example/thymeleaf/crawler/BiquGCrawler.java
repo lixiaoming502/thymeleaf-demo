@@ -15,6 +15,11 @@ public class BiquGCrawler extends AbstractCrawler {
     }
 
     @Override
+    protected String sensitiveWordsFilter(String htmlContent) {
+        return htmlContent;
+    }
+
+    @Override
     protected boolean isMatch(String content) {
         return false;
     }

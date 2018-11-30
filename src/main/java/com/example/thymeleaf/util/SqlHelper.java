@@ -210,7 +210,7 @@ public class SqlHelper {
     }
 
     private static void selectDemo() throws Exception {
-        String sql = "select title,click_times from t_article order by click_times desc limit 10";
+        String sql = "select id,category_id,title,click_times from t_article order by click_times desc limit 10";
         //String sql = "delete  from `t_chapter`  ";
         String result = SqlHelper.proxySql(sql);
         System.out.println("["+result+"]");
@@ -220,15 +220,27 @@ public class SqlHelper {
         }
     }
 
+    private static void index_recommand(int articleId,int module_id,int id) throws Exception {
+        String sql ="UPDATE t_recommend set article_id = ? where module=? and id=? ";
+        String p = SqlHelper.parseSql(sql,articleId,module_id,id);
+        System.out.println(p);
+        String result = SqlHelper.proxySql(p);
+        System.out.println("result:"+result);
+    }
+
     public static void main(String[] args) throws Exception {
-        int caseId = 1;
+        int caseId = 2;
         switch (caseId){
             case 0:
                 selectDemo();
                 break;
             case 1:
                 int articleId = 1265;
-                clearArticle(articleId);
+                //clearArticle(articleId);
+                break;
+            case 2:
+                index_recommand(19,1,1);
+                index_recommand(127,1,2);
                 break;
         }
     }

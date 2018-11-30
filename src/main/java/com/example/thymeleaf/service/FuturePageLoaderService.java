@@ -112,7 +112,11 @@ public class FuturePageLoaderService {
         record.setStateCode(statusCode);
         final String fileName = "data/" + id + ".txt";
         record.setResponse(fileName);
-        record.setLoaderState("F");
+        if(statusCode==200){
+            record.setLoaderState("F");
+        }else{
+            record.setLoaderState("A");
+        }
         record.setUpdateTime(new Date());
         futurePageLoaderMapper.updateByPrimaryKeySelective(record);
 

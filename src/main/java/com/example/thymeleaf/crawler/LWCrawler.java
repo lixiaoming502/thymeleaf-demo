@@ -37,6 +37,11 @@ public class LWCrawler extends AbstractCrawler {
     }
 
     @Override
+    protected String sensitiveWordsFilter(String htmlContent) {
+        return htmlContent;
+    }
+
+    @Override
     protected boolean isMatch(String content) {
         ///lw21321/1869332.html
         Pattern pattern = Pattern.compile("/lw\\d+./\\d+.html");

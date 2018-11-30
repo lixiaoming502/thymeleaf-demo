@@ -9,6 +9,10 @@ import jodd.http.HttpResponse;
 import jodd.util.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -154,12 +158,25 @@ public class T1 {
         System.out.println("md5Hex2 "+md5Hex2);
     }
 
+    private void testParse() throws IOException {
+        String path ="/Users/lixiaoming/Downloads/1314397.txt";
+        String cssQuery ="#chapterContent";
+        String respone = FileUtils.readFileToString(new File(path), "utf-8");
+        Document doc = Jsoup.parse(respone);
+
+
+        Elements items = doc.select(cssQuery);
+        Element content = items.get(0);
+        String htmlContent = content.html();
+        System.out.println(htmlContent);
+    }
+
 
 
 
     public static void main(String[] args) throws IOException {
         T1 t1 = new T1();
-        t1.testMd5();
+        t1.testParse();
 
 
     }

@@ -75,6 +75,11 @@ public class XslCrawler extends AbstractCrawler{
     }
 
     @Override
+    protected String sensitiveWordsFilter(String htmlContent) {
+        return htmlContent;
+    }
+
+    @Override
     protected boolean parseLevel3(int crawlerId, String url) {
         final String cssQueryNext = "#pb_next";
         final String cssQueryContent = "#chaptercontent";
