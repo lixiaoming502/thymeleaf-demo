@@ -1,0 +1,35 @@
+
+对于失败 url，进行计数，重试3次。
+
+此处采用只服务抓取页面，如果非必要，不去做解析工作。对外提供基本页面。
+
+只要一个页面出差，则标记为E,或者是不是也可以用http的StateCode代替？？
+
+
+常用观察进度的sql:
+
+select * from t_future_crawler where crawler_state  in ('F','E') order by id desc limit 10
+select * from t_future_page_loader where loader_state='F' order by id desc limit 10
+
+页面静态化，定时更新
+要有报警机制，发现失效的源，及时替换
+
+只采集文章标题，简介等基本信息。其他内容暂不采集，采用用户触发的模式。因此需要一个基本信息页，
+基本信息页展示的时候，发送ajax请求，触发后台进行数据采集。
+
+file not exsit->seed_id is 有效->更换seed_id->更新article_url
+
+一种思想是把本平台定位为异步爬取平台。其他平台配合此平台运转。
+另外一种思想是把对方定位为纯展示平台，不涉及过多的业务逻辑。
+目前偏向后一种，可深思之。
+
+那么此平台则需要主动发送update_page请求
+
+访问远程数据库，update_lst->update_page【更新】
+访问远程数据库，insert【新增】
+
+但是远程http通信，又担心安全问题
+
+BUG:番外，序章添加不了
+
+日志给出的信息一定要足够多。
