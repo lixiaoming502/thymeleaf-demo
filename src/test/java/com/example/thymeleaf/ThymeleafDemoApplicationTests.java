@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -187,10 +188,12 @@ public class ThymeleafDemoApplicationTests {
 	private void cc(List<String> pureLst, List<Pair> all, SearchResultPage r) {
 		long t1 = System.currentTimeMillis();
 
+		HashSet<String> locations = new HashSet<>();
 		r.getResultItems().stream().forEach(url->{
 			try {
 				System.out.println("select:"+url);
-				Pair pair = baiduBrother.analysisCssSelector(url, pureLst);
+
+				Pair pair = baiduBrother.analysisCssSelector(url, pureLst,locations);
 				//System.out.println(pair.getLeft()+"|"+pair.getRight());
 				if(pair!=null){
 					all.add(pair);

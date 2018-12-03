@@ -1,16 +1,12 @@
 package com.example.thymeleaf.controller;
 
+import com.example.thymeleaf.cron.BrotherCroner;
 import com.example.thymeleaf.cron.ByStanderWooniuSynCroner;
 import com.example.thymeleaf.cron.ChapterContentCallBackCroner;
 import com.example.thymeleaf.cron.FutureCrawlerCroner;
-import com.example.thymeleaf.model.Article;
 import com.example.thymeleaf.model.FutureCrawler;
-import com.example.thymeleaf.service.ArticleService;
-import com.example.thymeleaf.service.BaiduBrother;
 import com.example.thymeleaf.service.FutureCrawlerService;
 import com.example.thymeleaf.service.SynBrotherChapterId;
-import com.example.thymeleaf.vo.SearchResultPage;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,10 +43,8 @@ public class CommandController {
     private ByStanderWooniuSynCroner byStanderWooniuSynCroner;
 
     @Autowired
-    private ArticleService articleService;
+    private BrotherCroner brotherCroner;
 
-    @Autowired
-    private BaiduBrother baiduBrother;
 
     @RequestMapping("/list")
     public List<String> list() {
@@ -115,27 +108,16 @@ public class CommandController {
         return "OK";
     }
 
+    /**
+     *
+     * @param articleId
+     * @return Map key:url Value:level2_css_selector,如"http://www.biquge.com.tw/0_65/":"#list > dl"
+     * @throws Exception
+     */
     @RequestMapping(value = "/baidubrother/{article_id}",method= RequestMethod.GET, produces="application/json")
     public Map baiduBrother(@PathVariable("article_id") int articleId) throws Exception {
         logger.info("baiduBrother entry!");
-        Article article = articleService.selectByPrimary(articleId);
-        SearchResultPage searchResultPage = baiduBrother.search(article.getTitle().trim());
-        HashMap<String,String> retMap  = new HashMap<>();
-        if(searchResultPage.getResultItems().size()>0){
-            List<String> pureLst = baiduBrother.loadPureChpLst(articleId);
-            searchResultPage.getResultItems().forEach(url->{
-                try {
-                    logger.info("select:"+url);
-                    Pair pair = baiduBrother.analysisCssSelector(url, pureLst);
-                    if(pair!=null){
-                        logger.info(pair.getLeft()+"|"+pair.getRight());
-                        retMap.put((String) pair.getLeft(),(String) pair.getRight());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-        }
+        Map retMap = brotherCroner.baiduBrother(articleId);
         logger.info("baiduBrother out");
         return retMap;
     }

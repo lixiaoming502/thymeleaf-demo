@@ -99,9 +99,10 @@ public class AppUtils {
 
 
 
-    public static void main(String[] args) {
-        String input = "844章 派你做第一任爪哇总督";
-        System.out.println(Integer.parseInt(AppUtils.getNumbers(input)));
+    public static void main(String[] args) throws MalformedURLException {
+        System.out.println(extraDomain("http://www.biquge.com.tw/0_65/"));
+        System.out.println(extraDomain("http://m.biquge.com.tw/0_65_1/"));
+        System.out.println(extraDomain("https://www.biquge.info/0_764/"));
     }
 
     public static void writeObject(Object request,String filename) {

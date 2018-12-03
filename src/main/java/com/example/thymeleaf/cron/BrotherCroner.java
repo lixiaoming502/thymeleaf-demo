@@ -1,20 +1,19 @@
 package com.example.thymeleaf.cron;
 
-import com.example.thymeleaf.model.Article;
-import com.example.thymeleaf.model.Brother;
-import com.example.thymeleaf.model.FutureCrawler;
-import com.example.thymeleaf.model.FutureCrawlerCfg;
+import com.alibaba.fastjson.JSONObject;
+import com.example.thymeleaf.model.*;
 import com.example.thymeleaf.service.*;
 import com.example.thymeleaf.util.AppUtils;
+import com.example.thymeleaf.vo.SearchResultPage;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.MalformedURLException;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * job1:find article brother
@@ -41,6 +40,12 @@ public class BrotherCroner {
     @Autowired
     private FutureCrawlerService futureCrawlerService;
 
+    @Autowired
+    private BaiduBrother baiduBrother;
+
+    @Autowired
+    private DomainCssSelectorService domainCssSelectorService;
+
     private static final int MAXLEN = 20;
 
     //@Scheduled(fixedDelay = 3000)
@@ -57,7 +62,7 @@ public class BrotherCroner {
             try {
                 final String brotherUrl = brother.getBrotherUrl();
                 String domainName = AppUtils.extraDomain(brotherUrl);
-                FutureCrawlerCfg cfg = futureCrawlerCfgService.queryByDomain(domainName);
+                FutureCrawlerCfg cfg = futureCrawlerCfgService.queryByActiveDomain(domainName);
                 if(cfg==null){
                     logger.warn("can't get domainName cfg,["+domainName+"] borther_id ["+brother.getBrotherId()+"]");
                     return;
@@ -88,6 +93,77 @@ public class BrotherCroner {
                 logger.warn("",e);
             }
         });
+    }
+
+    public Map<String,String> baiduBrother(int articleId) throws Exception {
+        Article article = articleService.selectByPrimary(articleId);
+        SearchResultPage searchResultPage = baiduBrother.search(article.getTitle().trim());
+        HashMap<String,String> retMap  = new HashMap<>();
+        if(searchResultPage.getResultItems().size()>0){
+            List<String> pureLst = baiduBrother.loadPureChpLst(articleId);
+            HashSet<String> locations = new HashSet<>();
+            searchResultPage.getResultItems().forEach(url->{
+                try {
+                    logger.info("select:"+url);
+                    Pair pair = baiduBrother.analysisCssSelector(url, pureLst,locations);
+                    if(pair!=null){
+                        logger.info(pair.getLeft()+"|"+pair.getRight());
+                        retMap.put((String) pair.getLeft(),(String) pair.getRight());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        processBaiduBrotherResult(retMap,articleId);
+        return retMap;
+    }
+
+    private void processBaiduBrotherResult(Map<String,String> brotherMap,int articleId) throws MalformedURLException {
+        //外部传入要爬取的文章，应该放在一个缓存中
+        //使用baidu爬取到所有兄弟到一个map，排除主域名（比如说xiaoshuoli.com）和重复的域名（如biquge.com,m.biquge.com）-》全部插入t_brother
+        //插入t_brother
+        //查询t_future_crawler_cfg是否有该域名
+        //如果没有，插入t_future_crawler_cfg该域名，enable设置为A
+        Set<Map.Entry<String, String>> sets = brotherMap.entrySet();
+        for(Map.Entry<String, String> entry:sets){
+            final String brotherUrl = entry.getKey();
+
+            Brother brother = new Brother();
+            brother.setArticleId(articleId);
+            brother.setBrotherUrl(brotherUrl);
+            brother.setUpdateTurns(0);
+            logger.info("add brother "+brotherUrl);
+            Brother exist = brotherService.queryByURL(brotherUrl);
+            if(exist==null){
+                brotherService.insert(brother);
+            }
+
+            String domainName = AppUtils.extraDomain(brotherUrl);
+            FutureCrawlerCfg futureCrawlerCfg = futureCrawlerCfgService.queryByDomain(domainName);
+            if(futureCrawlerCfg==null){
+                futureCrawlerCfg = new FutureCrawlerCfg();
+                futureCrawlerCfg.setEnable("A");
+                futureCrawlerCfg.setDomainName(domainName);
+                logger.info("add futureCrawlerCfg ");
+                futureCrawlerCfg.setGap(5);
+                futureCrawlerCfg.setDefaultParserSeed(27);
+                futureCrawlerCfg.setCharset("utf8");
+                futureCrawlerCfgService.insert(futureCrawlerCfg);
+
+                futureCrawlerCfg = futureCrawlerCfgService.queryByDomain(domainName);
+
+                //插入t_domain_css_selector
+                DomainCssSelector domainCssSelector = new DomainCssSelector();
+                domainCssSelector.setDomainId(futureCrawlerCfg.getId());
+                domainCssSelector.setLevel2Selector(entry.getValue());
+                JSONObject rules = new JSONObject();
+                rules.put("l3_preUrl",brotherUrl);
+                domainCssSelector.setExtraRule(rules.toJSONString());
+                logger.info("add domain_css_selector");
+                domainCssSelectorService.insert(domainCssSelector);
+            }
+        }
     }
 
     private void findArticleBrother() {

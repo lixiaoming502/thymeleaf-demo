@@ -26,6 +26,22 @@ public class FutureCrawlerCfgService {
         futureCrawlerCfgMapper.updateByPrimaryKey(futureCrawlerCfg);
     }
 
+    public FutureCrawlerCfg queryByActiveDomain(String domain){
+        FutureCrawlerCfgExample example = new FutureCrawlerCfgExample();
+        FutureCrawlerCfgExample.Criteria criteria = example.createCriteria();
+        criteria.andDomainNameEqualTo(domain);
+        criteria.andEnableEqualTo("Y");
+        final List<FutureCrawlerCfg> futureCrawlerCfgs = futureCrawlerCfgMapper.selectByExample(example);
+        if(CollectionUtils.isEmpty(futureCrawlerCfgs)){
+            return null;
+        }
+        return futureCrawlerCfgs.get(0);
+    }
+
+    public int insert(FutureCrawlerCfg futureCrawlerCfg){
+        return futureCrawlerCfgMapper.insert(futureCrawlerCfg);
+    }
+
     public FutureCrawlerCfg queryByDomain(String domain){
         FutureCrawlerCfgExample example = new FutureCrawlerCfgExample();
         FutureCrawlerCfgExample.Criteria criteria = example.createCriteria();

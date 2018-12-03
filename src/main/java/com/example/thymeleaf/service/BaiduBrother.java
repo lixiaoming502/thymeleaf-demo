@@ -44,7 +44,7 @@ public class BaiduBrother {
     //最大候选数目
     private final static int MAX_CANDITATE_VALUE = 10;
 
-    private final HashSet<String> locations = new HashSet<>();
+    //private final HashSet<String> locations = new HashSet<>();
 
     @Autowired
     private JoddHttp joddHttp;
@@ -64,6 +64,8 @@ public class BaiduBrother {
     }
 
     public SearchResultPage search(String title) throws UnsupportedEncodingException, InterruptedException, ExecutionException, TimeoutException {
+        //避免重复analysis
+        //locations.clear();
         SearchResultPage searchResultPage = searchInner(title);
         int count = 0;
         while (searchResultPage.getResultItems().size()==0&&count< MAX_SEARCH_COUNT){
@@ -159,7 +161,7 @@ public class BaiduBrother {
         return ret;
     }
 
-    public Pair analysisCssSelector(String itemUrl, List<String> pureChpLst) throws UnsupportedEncodingException, InterruptedException, ExecutionException, TimeoutException {
+    public Pair analysisCssSelector(String itemUrl, List<String> pureChpLst,HashSet<String> locations) throws UnsupportedEncodingException, InterruptedException, ExecutionException, TimeoutException {
         HttpResponse response = joddHttp.sendBrowser(itemUrl, baseURL);
         HttpRequest request = response.getHttpRequest();
         String location = request.protocol()+"://"+request.host()+request.path();
@@ -214,6 +216,15 @@ public class BaiduBrother {
     }
 
     private String commonAncestor(List<Element> sels,int maxFit) {
+        final String[] selector = {null};
+        sels.stream().forEach(element -> {
+           selector[0] = element.cssSelector();
+           logger.info("selector[0]:"+selector[0]);
+        });
+        return selector[0];
+    }
+
+    private String commonAncestor1(List<Element> sels,int maxFit) {
         Map<String,Integer> countMap = new HashMap<>();
         List<Element> parentLst = new ArrayList<>();
         final int[] maxCount = {0};

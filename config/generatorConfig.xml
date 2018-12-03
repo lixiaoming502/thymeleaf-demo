@@ -47,6 +47,7 @@
         <table schema="" tableName="t_brother_chapter" domainObjectName="BrotherChapter"></table>
         <table schema="" tableName="t_schedule_task" domainObjectName="ScheduleTask"></table>-->
         <table schema="" tableName="t_wooniu_syn_ids" domainObjectName="WooniuSynId"></table>
+        <table schema="" tableName="t_domain_css_selector" domainObjectName="DomainCssSelector"></table>
 
     </context>
 </generatorConfiguration>

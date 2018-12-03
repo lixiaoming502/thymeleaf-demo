@@ -3,6 +3,7 @@ package com.example.thymeleaf;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.thymeleaf.service.JoddHttp;
+import com.google.common.cache.CacheBuilder;
 import jodd.http.HttpBrowser;
 import jodd.http.HttpRequest;
 import jodd.http.HttpResponse;
@@ -171,7 +172,9 @@ public class T1 {
         System.out.println(htmlContent);
     }
 
-
+    private void testcacheBuilder(){
+        CacheBuilder<Object, Object> cache = CacheBuilder.newBuilder();
+    }
 
 
     public static void main(String[] args) throws IOException {
