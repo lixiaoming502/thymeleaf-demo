@@ -3,14 +3,19 @@ package com.example.thymeleaf.service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.thymeleaf.cron.ByStanderWooniuSynCroner;
+import com.example.thymeleaf.cron.ChapterContentCallBackCroner;
 import com.example.thymeleaf.model.Article;
+import com.example.thymeleaf.model.BrotherChapter;
 import com.example.thymeleaf.model.Chapter;
 import com.example.thymeleaf.model.FutureCrawler;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -29,6 +34,12 @@ public class ArticleCallBack extends AbstractCallBack{
 
     @Autowired
     private ByStanderWooniuSynCroner byStanderWooniuSynCroner;
+
+    @Autowired
+    private BrotherChapterService brotherChapterService;
+
+    @Autowired
+    private ChapterContentCallBackCroner chapterContentCallBackCroner;
 
 
     protected void callback_level1(int crawlerId) {
@@ -80,10 +91,47 @@ public class ArticleCallBack extends AbstractCallBack{
         }else{
             chapter = chapterService.queryById(refId);
         }
-        chapter.setLocalUrl(record.getResponse());
+        final String localUrl = record.getResponse();
+        if(isEmpty(localUrl)){
+            logger.info("抓取的内容为空，尝试更换brother ,crawlerId "+crawlerId);
+            if(changeBrother(chapter,record.getPageUrl())){
+                return;
+            }
+        }
+        chapter.setLocalUrl(localUrl);
         chapterService.update(chapter);
         logger.info("callback_level3 article_id "+chapter.getArtileId());
         byStanderWooniuSynCroner.synArticleIDMap(chapter.getArtileId());
+    }
+
+    private boolean changeBrother(Chapter chapter, String pageUrl) {
+        List<BrotherChapter> lst = brotherChapterService.queryByChapterId(chapter.getId());
+        String seleURL = null;
+        if(CollectionUtils.isNotEmpty(lst)){
+            for(BrotherChapter brotherChapter:lst){
+                String bURL = brotherChapter.getUrl();
+                if(!bURL.equals(pageUrl)){
+                    seleURL = bURL;
+                    break;
+                }
+            }
+        }
+        if(StringUtils.isNotEmpty(seleURL)){
+            logger.info("changeBrother from "+pageUrl+" to "+seleURL);
+            chapterContentCallBackCroner.addChapterFutureCrawler(chapter,chapter.getId(),seleURL);
+            return true;
+        }
+        return false;
+    }
+
+
+    private boolean isEmpty(String filePath){
+        File file = new File(filePath);
+        if(file.length() < 10){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     protected void callback_level2(int crawlerId) {

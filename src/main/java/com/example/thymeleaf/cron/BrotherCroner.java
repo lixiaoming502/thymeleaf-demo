@@ -142,13 +142,17 @@ public class BrotherCroner {
             String domainName = AppUtils.extraDomain(brotherUrl);
             FutureCrawlerCfg futureCrawlerCfg = futureCrawlerCfgService.queryByDomain(domainName);
             if(futureCrawlerCfg==null){
+                String vv = entry.getValue();
+                String[] av = vv.split("\\|");
+                String charSet = av[1];
+                String l2Selector = av[0];
                 futureCrawlerCfg = new FutureCrawlerCfg();
                 futureCrawlerCfg.setEnable("A");
                 futureCrawlerCfg.setDomainName(domainName);
                 logger.info("add futureCrawlerCfg ");
                 futureCrawlerCfg.setGap(5);
                 futureCrawlerCfg.setDefaultParserSeed(27);
-                futureCrawlerCfg.setCharset("utf8");
+                futureCrawlerCfg.setCharset(charSet);
                 futureCrawlerCfgService.insert(futureCrawlerCfg);
 
                 futureCrawlerCfg = futureCrawlerCfgService.queryByDomain(domainName);
@@ -156,9 +160,10 @@ public class BrotherCroner {
                 //插入t_domain_css_selector
                 DomainCssSelector domainCssSelector = new DomainCssSelector();
                 domainCssSelector.setDomainId(futureCrawlerCfg.getId());
-                domainCssSelector.setLevel2Selector(entry.getValue());
+                domainCssSelector.setLevel2Selector(l2Selector);
                 JSONObject rules = new JSONObject();
-                rules.put("l3_preUrl",brotherUrl);
+                rules.put("l3_preUrl","");
+                rules.put("l2_example_url",brotherUrl);
                 domainCssSelector.setExtraRule(rules.toJSONString());
                 logger.info("add domain_css_selector");
                 domainCssSelectorService.insert(domainCssSelector);

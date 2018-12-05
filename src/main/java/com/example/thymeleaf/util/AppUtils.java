@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,6 +40,20 @@ public class AppUtils {
         java.net.URL  url = new  java.net.URL(pageUrl);
         String host = url.getHost();// 获取主机名
         return host;
+    }
+
+    public static String getRootURL(String urlStr) throws MalformedURLException {
+        URL url = new URL(urlStr);
+        //String path = url.getFile().substring(0, url.getFile().lastIndexOf('/'));
+        String base = url.getProtocol() + "://" + url.getHost() ;
+        return base;
+    }
+
+    public static String getBaseURL(String urlStr) throws MalformedURLException {
+        URL url = new URL(urlStr);
+        String path = url.getFile().substring(0, url.getFile().lastIndexOf('/'));
+        String base = url.getProtocol() + "://" + url.getHost() + path;
+        return base;
     }
 
     public static String getCurrentDay(){
@@ -100,9 +115,9 @@ public class AppUtils {
 
 
     public static void main(String[] args) throws MalformedURLException {
-        System.out.println(extraDomain("http://www.biquge.com.tw/0_65/"));
-        System.out.println(extraDomain("http://m.biquge.com.tw/0_65_1/"));
-        System.out.println(extraDomain("https://www.biquge.info/0_764/"));
+        System.out.println(getBaseURL("https://m.xiaoshuoli.com"));
+        System.out.println("/i5156/14833335.html".startsWith("/"));
+
     }
 
     public static void writeObject(Object request,String filename) {

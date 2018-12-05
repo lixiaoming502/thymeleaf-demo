@@ -2,8 +2,10 @@ package com.example.thymeleaf.service;
 
 import com.example.thymeleaf.model.Brother;
 import com.example.thymeleaf.model.BrotherChapter;
+import com.example.thymeleaf.model.Chapter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.text.similarity.JaccardSimilarity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,11 +36,47 @@ public class SynBrotherChapterId {
         lst.forEach(brother -> {
             List<BrotherChapter> brotherChapters = brotherChapterService.queryByBrotherId(brother.getBrotherId());
             brotherChapters.forEach(brotherChapter -> {
-                int chapterId = findChapterId(brotherChapter.getTitle(),articleId);
+                int chapterId = findChapterId(brotherChapter.getTitle(),articleId,brotherChapter.getSeqId());
                 brotherChapter.setChapterId(chapterId);
                 brotherChapterService.update(brotherChapter);
             });
         });
+    }
+
+    public int findChapterId(String brotherTitle,int articleId,int seqId){
+        String pureText = extractPureTxt(brotherTitle);
+        //先根据seqId比较，文本相似度
+        Chapter chapter = chapterService.queryByArticleIdSeqId(articleId,seqId);
+        if(chapter!=null){
+            String chpPureTitle = extractPureTxt(chapter.getTitle());
+            JaccardSimilarity jaccardSimilarity = new JaccardSimilarity();
+            Double e = jaccardSimilarity.apply(pureText,chpPureTitle);
+            logger.info("brotherTitle:"+brotherTitle+"check "+pureText+"->"+chpPureTitle);
+            if(e>0.9){
+                return chapter.getId();
+            }
+        }
+        //尝试在seqId前后50的范围做文本匹配
+        int start = 0;
+        if(seqId>50){
+            start = seqId-50;
+        }
+        List<Chapter> lst = chapterService.selectByArticleIdSeqId(articleId, start);
+        for(Chapter chapter1:lst){
+            String chpPureTitle = extractPureTxt(chapter1.getTitle());
+            JaccardSimilarity jaccardSimilarity = new JaccardSimilarity();
+            Double e = jaccardSimilarity.apply(pureText,chpPureTitle);
+            if(e>0.9){
+                logger.info("lst match brotherTitle:"+brotherTitle+"check "+pureText+"->"+chpPureTitle);
+                return chapter1.getId();
+            }
+        }
+
+        //match chapter_id,according to title
+        //select like
+        int chapterId = chapterService.selectLike(pureText,articleId);
+
+        return chapterId;
     }
 
     private int findChapterId(String brotherTitle,int articleId){

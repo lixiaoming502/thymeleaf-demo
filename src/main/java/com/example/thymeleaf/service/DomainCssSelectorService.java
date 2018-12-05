@@ -32,4 +32,8 @@ public class DomainCssSelectorService {
             return null;
         }
     }
+
+    public void update(DomainCssSelector record){
+        domainCssSelectorMapper.updateByPrimaryKey(record);
+    }
 }

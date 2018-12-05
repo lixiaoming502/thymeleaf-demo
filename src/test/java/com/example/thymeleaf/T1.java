@@ -176,11 +176,63 @@ public class T1 {
         CacheBuilder<Object, Object> cache = CacheBuilder.newBuilder();
     }
 
+    private void json(){
+        JSONObject jsonObject = new JSONObject();
+        //sensitive_words
+        JSONArray jsonArray = new JSONArray();
+        jsonObject.put("begin","bv");
+        jsonObject.put("end","ev");
+        jsonArray.add(jsonObject);
+        JSONObject all = new JSONObject();
+        all.put("sensitive_words",jsonArray);
+        System.out.println(all.toJSONString());
+    }
 
-    public static void main(String[] args) throws IOException {
+    private String extractPureTxt(String brotherTitle) {
+        //第040章一秒不想看到
+        int idx1 = brotherTitle.indexOf("第");
+        int idx2 = brotherTitle.indexOf("章");
+        if(idx1>-1&&idx2>idx1){
+            return brotherTitle.substring(idx2+1).trim();
+        }else{
+            return brotherTitle;
+        }
+    }
+
+    private void test_browser(){
+        String url = "http://www.f96.net/3/3358/";
+        HttpBrowser browser = new HttpBrowser();
+
+        HttpRequest request = HttpRequest.get(url);
+        browser.sendRequest(request);
+        HttpResponse response = browser.getHttpResponse();
+        int statusCode  = response.statusCode();
+        System.out.println(response);
+    }
+
+    private void test_browser2() throws InterruptedException, ExecutionException, TimeoutException {
+        String url = "http://www.f96.net/3/3358/";
+        JoddHttp joddHttp = new JoddHttp();
+
+        HttpResponse response = joddHttp.sendBrowser(url,url);
+        int statusCode  = response.statusCode();
+        System.out.println(response);
+    }
+
+    private void test_l2css(){
+        String org = "html > body > section.w-all > div.card.mt20:nth-child(4) > div.body > ul.dirlist.clearfix > li:nth-child(15) > a";
+        String child = "nth-child";
+        int idx1 = org.lastIndexOf(child);
+        int idx2 = org.indexOf(">",idx1);
+        String pre = org.substring(0,idx1-1);
+        String end = org.substring(idx2-1);
+        System.out.println(pre+end);
+        System.out.println(end);
+    }
+
+
+    public static void main(String[] args) throws IOException, InterruptedException, ExecutionException, TimeoutException {
         T1 t1 = new T1();
-        t1.testParse();
-
-
+        t1.test_l2css();
     }
 }

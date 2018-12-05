@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.thymeleaf.model.Brother;
 import com.example.thymeleaf.model.BrotherChapter;
+import com.example.thymeleaf.model.Chapter;
 import com.example.thymeleaf.model.FutureCrawler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.text.similarity.JaccardSimilarity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +31,9 @@ public class BrotherCallBack extends AbstractCallBack{
     @Autowired
     private BrotherService brotherService;
 
+    @Autowired
+    private SynBrotherChapterId synBrotherChapterId;
+
 
     protected void callback_level1(int crawlerId) {
         //TODO:
@@ -47,9 +52,11 @@ public class BrotherCallBack extends AbstractCallBack{
         FutureCrawler record = futureCrawlerService.queryByCrawlerId(crawlerId);
         JSONArray jsonArray = parseToJsonArray(record);
         List<JSONObject> lst = parseToList(jsonArray);
+
         Brother exist = brotherService.queryByURL(record.getPageUrl());
         final Integer brotherId = exist.getBrotherId();
         Integer articleId = brotherService.selectByBrotherId(brotherId).getArticleId();
+        //List<Chapter> chapterList = chapterService.queryByArticleId(articleId);
         int maxSeqId = brotherChapterService.getMaxSeqId(brotherId);
         for(JSONObject info:lst) {
             int seqId = info.getInteger("seqId");
@@ -62,7 +69,7 @@ public class BrotherCallBack extends AbstractCallBack{
                 String url = info.getString("href");
                 chapter.setUrl(url);
                 chapter.setCollectFlag(0);
-                int chapterId = findChapterId(title,articleId);
+                int chapterId = synBrotherChapterId.findChapterId(title,articleId,seqId);
                 chapter.setChapterId(chapterId);
                 try{
                     brotherChapterService.addRecord(chapter);
@@ -79,13 +86,23 @@ public class BrotherCallBack extends AbstractCallBack{
         }
     }
 
-    private int findChapterId(String brotherTitle,int articleId){
+    private int findChapterId(String brotherTitle,int articleId,int seqId){
+        String pureText = extractPureTxt(brotherTitle);
+        //先根据seqId比较，文本相似度
+        Chapter chapter = chapterService.queryByArticleIdSeqId(articleId,seqId);
+        if(chapter!=null){
+            String chpPureTitle = extractPureTxt(chapter.getTitle());
+            JaccardSimilarity jaccardSimilarity = new JaccardSimilarity();
+            Double e = jaccardSimilarity.apply(pureText,chpPureTitle);
+            logger.info("brotherTitle:"+brotherTitle+"check "+pureText+"->"+chpPureTitle);
+            if(e>0.9){
+                return chapter.getId();
+            }
+        }
         //match chapter_id,according to title
         //select like
-        String pureText = extractPureTxt(brotherTitle);
         int chapterId = chapterService.selectLike(pureText,articleId);
         return chapterId;
-
     }
 
     private String extractPureTxt(String brotherTitle) {

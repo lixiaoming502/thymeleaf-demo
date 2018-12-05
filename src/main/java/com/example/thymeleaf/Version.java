@@ -1,4 +1,4 @@
 package com.example.thymeleaf;
 public class Version {
-    public static String version = "2018-11-08 13:51:01";
+    public static String version = "2018-12-05 11:27:56";
 }

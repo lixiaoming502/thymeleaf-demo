@@ -207,7 +207,7 @@ public class BaiduBrother {
             String cssSelector = commonAncestor(sels,sels.size());
             logger.info("commonAncestor:"+cssSelector);
             if(cssSelector!=null){
-                return new ImmutablePair(location,cssSelector);
+                return new ImmutablePair(location,cssSelector+"|"+charset);
             }
         }else{
             logger.info("get response code ["+ statusCode +"]");
@@ -221,7 +221,8 @@ public class BaiduBrother {
            selector[0] = element.cssSelector();
            logger.info("selector[0]:"+selector[0]);
         });
-        return selector[0];
+        String ret = removeLastNthChild(selector[0]);
+        return ret;
     }
 
     private String commonAncestor1(List<Element> sels,int maxFit) {
@@ -268,6 +269,18 @@ public class BaiduBrother {
             }
         }
         return similar;
+    }
+
+    private String removeLastNthChild(String org){
+        //String org = "html > body > section.w-all > div.card.mt20:nth-child(4) > div.body > ul.dirlist.clearfix > li:nth-child(15) > a";
+        String child = "nth-child";
+        int idx1 = org.lastIndexOf(child);
+        int idx2 = org.indexOf(">",idx1);
+        String pre = org.substring(0,idx1-1);
+        String end = org.substring(idx2-1);
+        String ret = pre + end;
+        logger.info(org + "转换为：" + end);
+        return ret;
     }
 
 }

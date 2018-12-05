@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -155,6 +156,13 @@ public abstract class AbstractCrawler implements Crawler {
         if(hasCrawlerPageWaiting(crawlerId)){
             return false;
         }
+        if(url.endsWith(".html")||url.endsWith(".htm")){
+            try {
+                rootURL = AppUtils.getBaseURL(url)+"/";
+            } catch (MalformedURLException e) {
+                logger.warn("",e);
+            }
+        }
         DriverFuture future = createDriverFuture(crawlerId, url);
         if(future.isDone()) {
             if(future.getStatusCode()==200){
@@ -172,6 +180,15 @@ public abstract class AbstractCrawler implements Crawler {
                     if(!isMatch(href)){
                         logger.info("unmatched ["+href+"]");
                         continue;
+                    }
+                    if(href.startsWith("/")){
+                        try {
+                            rootURL = AppUtils.getRootURL(url);
+                        } catch (MalformedURLException e) {
+                            logger.warn("",e);
+                        }
+                    }else if(href.startsWith("http")){
+                        rootURL="";
                     }
                     seqId++;
                     String title = item.text();

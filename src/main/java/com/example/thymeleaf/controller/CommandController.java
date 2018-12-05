@@ -5,6 +5,7 @@ import com.example.thymeleaf.cron.ByStanderWooniuSynCroner;
 import com.example.thymeleaf.cron.ChapterContentCallBackCroner;
 import com.example.thymeleaf.cron.FutureCrawlerCroner;
 import com.example.thymeleaf.model.FutureCrawler;
+import com.example.thymeleaf.service.DomainCssSelectorGuess;
 import com.example.thymeleaf.service.FutureCrawlerService;
 import com.example.thymeleaf.service.SynBrotherChapterId;
 import org.slf4j.Logger;
@@ -45,6 +46,9 @@ public class CommandController {
     @Autowired
     private BrotherCroner brotherCroner;
 
+    @Autowired
+    private DomainCssSelectorGuess domainCssSelectorGuess;
+
 
     @RequestMapping("/list")
     public List<String> list() {
@@ -54,6 +58,7 @@ public class CommandController {
         cmds.add("/recrawlall");
         cmds.add("/bystandsyn/{article_id}");
         cmds.add("/baidubrother/{article_id}");
+        cmds.add("/domain/guess/{domain_id}/{page_level}");
         return cmds;
     }
 
@@ -120,5 +125,13 @@ public class CommandController {
         Map retMap = brotherCroner.baiduBrother(articleId);
         logger.info("baiduBrother out");
         return retMap;
+    }
+
+    @RequestMapping(value = "/domain/guess/{domain_id}/{page_level}",method= RequestMethod.GET, produces="application/json")
+    public String guessDomain(@PathVariable("domain_id") int domainId,@PathVariable("page_level") int pageLevel) throws Exception {
+        logger.info("guessDomain entry!");
+        String ret = domainCssSelectorGuess.guess2(domainId,pageLevel);
+        logger.info("guessDomain out");
+        return ret;
     }
 }

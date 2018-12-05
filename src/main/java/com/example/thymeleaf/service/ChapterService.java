@@ -130,4 +130,16 @@ public class ChapterService {
     public void delete(Integer id) {
         chapterMapper.deleteByPrimaryKey(id);
     }
+
+    public Chapter queryByArticleIdSeqId(int articleId, int seqId) {
+        ChapterExample chapterExample = new ChapterExample();
+        ChapterExample.Criteria condition = chapterExample.createCriteria();
+        condition.andArtileIdEqualTo(articleId);
+        condition.andSeqIdEqualTo(seqId);
+        List<Chapter> lst = chapterMapper.selectByExample(chapterExample);
+        if(CollectionUtils.isNotEmpty(lst)){
+            return lst.get(0);
+        }
+        return null;
+    }
 }

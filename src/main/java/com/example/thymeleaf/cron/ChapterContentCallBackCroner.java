@@ -76,8 +76,12 @@ public class ChapterContentCallBackCroner {
             });
         }
        String seleURL =  selectByQueueSize(urls);
+        addChapterFutureCrawler(chapter, chapterId, seleURL);
+    }
+
+    public void addChapterFutureCrawler(Chapter chapter, int chapterId, String seleURL) {
         logger.info("seleURL:"+seleURL+" chapterId."+chapterId);
-       FutureCrawlerCfg futureCrawlerCfg = queryByUrl(seleURL);
+        FutureCrawlerCfg futureCrawlerCfg = queryByUrl(seleURL);
         int level = 3;
         String crawlerState = "A";
         FutureCrawler futureCrawler = new FutureCrawler();

@@ -49,8 +49,13 @@ public class CssSelectorCrawler extends AbstractCrawler {
     protected boolean parseLevel2(int crawlerId, String url) {
         DomainCssSelector cssRecord = queryDomainCssSelector();
         final String cssQuery = cssRecord.getLevel2Selector();
+        /**
         String l3_preUrl = jsonRules.getString("l3_preUrl");
-        return parseLevel2(crawlerId, url, cssQuery,l3_preUrl);
+        if(StringUtils.isEmpty(l3_preUrl)){
+            l3_preUrl = url;
+        }**/
+
+        return parseLevel2(crawlerId, url, cssQuery,url);
     }
 
     @Override
@@ -64,16 +69,18 @@ public class CssSelectorCrawler extends AbstractCrawler {
         String rules = cssRecord.getExtraRule();
         if(StringUtils.isNotEmpty(rules)){
             JSONArray sensitives = jsonRules.getJSONArray("sensitive_words");
-            String newHtmlContent = htmlContent;
-            for(Object sensitive:sensitives){
-                JSONObject jsonSensitive = (JSONObject)sensitive;
-                String begin = jsonSensitive.getString("begin");
-                String end = jsonSensitive.getString("end");
-                newHtmlContent = markCleaner.replaceWithStrDelimer(newHtmlContent,begin,end);
-            }
-            if(newHtmlContent.length()/htmlContent.length()*100<80){
-                logger.info("sensitiveWordsFilter may be error");
-                return newHtmlContent;
+            if(sensitives!=null){
+                String newHtmlContent = htmlContent;
+                for(Object sensitive:sensitives){
+                    JSONObject jsonSensitive = (JSONObject)sensitive;
+                    String begin = jsonSensitive.getString("begin");
+                    String end = jsonSensitive.getString("end");
+                    newHtmlContent = markCleaner.replaceWithStrDelimer(newHtmlContent,begin,end);
+                }
+                if(newHtmlContent.length()/htmlContent.length()*100<80){
+                    logger.info("sensitiveWordsFilter may be error");
+                    return newHtmlContent;
+                }
             }
         }
         return htmlContent;
