@@ -88,13 +88,17 @@ public class JoddHttp {
         }
         threadLocal.put(Thread.currentThread(),domainName);
         HttpBrowser browser = browsers.get(domainName);
+
         if(browser==null){
             browser = new HttpBrowser();
+            //信任所有证书
+            //browser.getHttpRequest().trustAllCerts(true);
             browsers.put(domainName,browser);
         }
         HttpRequest request = HttpRequest.get(url);
         request.header("User-Agent",randomUA());
         request.header("referer",refer);
+        request.trustAllCerts(true);
         try{
             browser.sendRequest(request);
         }catch (Exception e){

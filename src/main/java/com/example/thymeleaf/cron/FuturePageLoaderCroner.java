@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 
@@ -24,6 +25,7 @@ import java.util.concurrent.*;
 @Component
 public class FuturePageLoaderCroner {
 
+    private static final int MAX_TRY_TIMES = 3;
     private static Log logger = LogFactory.getLog(FuturePageLoaderCroner.class);
 
     @Autowired
@@ -36,6 +38,8 @@ public class FuturePageLoaderCroner {
     private FutureCrawlerCfgService futureCrawlerCfgService;
 
     private Executor executor = Executors.newFixedThreadPool(5);
+
+    private Map<Integer,Integer> errorCountMap = new ConcurrentHashMap();
 
     //@Scheduled(fixedDelay = 1000)
     public void work(){
@@ -84,27 +88,34 @@ public class FuturePageLoaderCroner {
         try {
             HttpResponse response = joddHttp.sendBrowser(futurePageLoader.getPageUrl(),futurePageLoader.getPageUrl());
             int statusCode = response.statusCode();
+            final Integer futurePageLoaderId = futurePageLoader.getId();
             if(statusCode!=200){
                 logger.warn("get statusCode "+statusCode+" recrawl later");
-                response = joddHttp.sendBrowser(futurePageLoader.getPageUrl(),futurePageLoader.getPageUrl());
-                statusCode = response.statusCode();
-                logger.warn(" recrawl get statusCode "+statusCode);
+               // response = joddHttp.sendBrowser(futurePageLoader.getPageUrl(),futurePageLoader.getPageUrl());
+                //statusCode = response.statusCode();
+                logger.warn(" response is  ["+response+"]");
+                int count = 0;
+                if(errorCountMap.get(futurePageLoaderId)!=null){
+                    count = errorCountMap.get(futurePageLoaderId);
+                }
+                if(count<MAX_TRY_TIMES){
+                    errorCountMap.put(futurePageLoaderId,count+1);
+                    return;
+                }else {
+                    errorCountMap.remove(futurePageLoaderId);
+                }
             }
-            String body = new String(response.bodyBytes(),charset);
+            final byte[] bytes = response.bodyBytes();
+            String body ;
+            if(bytes!=null){
+                body = new String(bytes,charset);
+            }else{
+                body = response.toString();
+            }
             //更新状态，写文件，如果写文件异常则回滚
-            futurePageLoaderService.loadComplete(futurePageLoader.getId(),statusCode,body);
+            futurePageLoaderService.loadComplete(futurePageLoaderId,statusCode,body);
         }catch (Exception e){
-            logger.warn("",e);
-        }
-    }
-
-    private void loadPage(FuturePageLoader futurePageLoader) {
-        try {
-            String pageUrl = futurePageLoader.getPageUrl();
-            String domainName = AppUtils.extraDomain(pageUrl);
-            futurePageLoaderService.updateCrawlState(domainName,futurePageLoader.getId());
-        } catch (Exception e) {
-            logger.warn("",e);
+            logger.info("",e);
         }
     }
 

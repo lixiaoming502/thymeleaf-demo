@@ -40,7 +40,8 @@ public class DefaultSelfDriver implements SelfDriver {
         }else{
             //判断状态
             FuturePageLoader futurePageLoader = lst.get(0);
-            if(futurePageLoader.getLoaderState().equals("F")) {
+            if(futurePageLoader.getLoaderState().equals("F")||
+                    futurePageLoader.getLoaderState().equals("E")) {
                 File file = new File(futurePageLoader.getResponse());
                 String content = null;
                 try {

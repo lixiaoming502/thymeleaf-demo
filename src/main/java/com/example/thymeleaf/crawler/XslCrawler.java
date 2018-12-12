@@ -2,13 +2,16 @@ package com.example.thymeleaf.crawler;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.example.thymeleaf.model.Article;
 import com.example.thymeleaf.selfdrive.DriverFuture;
+import com.example.thymeleaf.service.ArticleService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -24,6 +27,9 @@ import java.util.regex.Pattern;
  */
 @Component
 public class XslCrawler extends AbstractCrawler{
+
+    @Autowired
+    private ArticleService articleService;
 
     private static Logger logger = LoggerFactory.getLogger(XslCrawler.class);
 
@@ -72,6 +78,52 @@ public class XslCrawler extends AbstractCrawler{
         }else{
             return false;
         }
+    }
+
+    @Override
+    protected boolean parseLevel4(int crawlerId, String url) {
+        if(hasCrawlerPageWaiting(crawlerId)){
+            return false;
+        }
+        DriverFuture future = createDriverFuture(crawlerId, url);
+        if(future.isDone()) {
+            String respone = (String) future.getRespone();
+            Document doc = Jsoup.parse(respone);
+            Elements review = doc.select("p.review");
+            Elements title = doc.select("h1.title");
+            Elements items = doc.select(".btn a");
+            String infoUrl = url;
+            Elements sort = doc.select("p.sort");
+            Elements img = doc.select("div img");
+            Elements author = doc.select("p.author");
+            //status,img,author
+            Article article = new Article();
+            String commend = review.get(0).text();
+            article.setComment(commend);
+            String titleTxt = title.get(0).text();
+            article.setTitle(titleTxt);
+            String listUrl = items.get(0).attr("href");
+            article.setListUrl(listUrl);
+            article.setInfoUrl(infoUrl);
+            int sortV = convertSort(sort.get(0).text());
+            article.setCategoryId(sortV);
+            article.setImg(img.get(0).attr("href"));
+            article.setAuthor(author.get(0).text());
+            Article exist = articleService.queryByListURL(listUrl);
+            if(exist==null){
+                articleService.addRecord(article);
+            }else{
+                article.setId(exist.getId());
+                articleService.update(article);
+            }
+            try {
+                futureCrawlerService.finish(crawlerId,"F",JSONObject.toJSONString(article));
+            } catch (IOException e) {
+                logger.warn("",e);
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override

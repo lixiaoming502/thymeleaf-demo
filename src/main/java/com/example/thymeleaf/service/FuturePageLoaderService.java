@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -115,7 +116,7 @@ public class FuturePageLoaderService {
         if(statusCode==200){
             record.setLoaderState("F");
         }else{
-            record.setLoaderState("A");
+            record.setLoaderState("E");
         }
         record.setUpdateTime(new Date());
         futurePageLoaderMapper.updateByPrimaryKeySelective(record);
@@ -150,7 +151,11 @@ public class FuturePageLoaderService {
         FuturePageLoaderExample example = new FuturePageLoaderExample();
         FuturePageLoaderExample.Criteria criteria = example.createCriteria();
         criteria.andCrawlerIdEqualTo(crawlerId);
-        criteria.andLoaderStateNotEqualTo("F");
+        //criteria.andLoaderStateNotEqualTo("F");
+        List<String> values = new ArrayList<>();
+        values.add("E");
+        values.add("F");
+        criteria.andLoaderStateNotIn(values);
         List<FuturePageLoader> lst = futurePageLoaderMapper.selectByExample(example);
         return CollectionUtils.isNotEmpty(lst);
     }
@@ -162,7 +167,7 @@ public class FuturePageLoaderService {
         FuturePageLoaderExample example = new FuturePageLoaderExample();
         FuturePageLoaderExample.Criteria criteria = example.createCriteria();
         criteria.andDomainIdEqualTo(domainId);
-        criteria.andLoaderStateNotEqualTo("F");
+        criteria.andLoaderStateEqualTo("A");
         example.setOrderByClause("crawler_id,id");
         List<FuturePageLoader> lst = futurePageLoaderMapper.selectByExample(example);
         if(CollectionUtils.isEmpty(lst)){

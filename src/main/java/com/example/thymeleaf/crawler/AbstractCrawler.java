@@ -68,7 +68,14 @@ public abstract class AbstractCrawler implements Crawler {
                 return parseLevel2(crawlerId,url);
             case 3:
                 return parseLevel3(crawlerId,url);
+            case 4:
+                //文章信息页面爬取
+                return parseLevel4(crawlerId,url);
         }
+        return false;
+    }
+
+    protected boolean parseLevel4(int crawlerId, String url) {
         return false;
     }
 
