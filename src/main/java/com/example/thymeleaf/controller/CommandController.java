@@ -7,6 +7,7 @@ import com.example.thymeleaf.cron.FutureCrawlerCroner;
 import com.example.thymeleaf.model.FutureCrawler;
 import com.example.thymeleaf.service.DomainCssSelectorGuess;
 import com.example.thymeleaf.service.FutureCrawlerService;
+import com.example.thymeleaf.service.NearTextService;
 import com.example.thymeleaf.service.SynBrotherChapterId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,9 @@ public class CommandController {
     @Autowired
     private DomainCssSelectorGuess domainCssSelectorGuess;
 
+    @Autowired
+    private NearTextService nearTextService;
+
 
     @RequestMapping("/list")
     public List<String> list() {
@@ -59,6 +63,7 @@ public class CommandController {
         cmds.add("/bystandsyn/{article_id}");
         cmds.add("/baidubrother/{article_id}");
         cmds.add("/domain/guess/{domain_id}/{page_level}");
+        cmds.add("/near/{article_id}/{nearLevel}");
         return cmds;
     }
 
@@ -133,5 +138,19 @@ public class CommandController {
         String ret = domainCssSelectorGuess.guess2(domainId,pageLevel);
         logger.info("guessDomain out");
         return ret;
+    }
+
+    @RequestMapping(value = "/near/{article_id}/{near_level}",method= RequestMethod.GET, produces="application/json")
+    public String near(@PathVariable("article_id") int articleId,@PathVariable("near_level") int nearLevel) throws Exception {
+        logger.info("near entry!");
+        if(nearLevel==0){
+            nearTextService.genArticleNear(articleId);
+        }else if(nearLevel==1){
+            nearTextService.replaceOnline(articleId);
+        }else if(nearLevel==2){
+            nearTextService.genAndReplace(articleId);
+        }
+        logger.info("near out");
+        return "OK";
     }
 }

@@ -23,6 +23,8 @@ public class JoddHttp {
 
     private static Logger logger = LoggerFactory.getLogger(JoddHttp.class);
 
+    private Executor httpExecutors = Executors.newCachedThreadPool();
+
     final  static String[] USER_AGENTS = {
         "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; AcooBrowser; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
                 "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Acoo Browser; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)",
@@ -153,6 +155,17 @@ public class JoddHttp {
         browser.sendRequest(request);
         HttpResponse response = browser.getHttpResponse();
         return response;
+    }
+
+    public FutureTask<HttpResponse> aSynSendBrowserByPost(String url,String refer,Map formMap) {
+        FutureTask<HttpResponse> futureTask = new FutureTask<HttpResponse>(new Callable<HttpResponse>() {
+            @Override
+            public HttpResponse call() throws Exception {
+                return sendBrowserByPost(url,refer,formMap);
+            }
+        });
+        httpExecutors.execute(futureTask);
+        return futureTask;
     }
 
     private String randomUA() {

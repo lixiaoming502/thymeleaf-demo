@@ -5,6 +5,7 @@ import com.example.thymeleaf.model.Chapter;
 import com.example.thymeleaf.model.WooniuSynId;
 import com.example.thymeleaf.service.ArticleService;
 import com.example.thymeleaf.service.ChapterService;
+import com.example.thymeleaf.service.NearTextService;
 import com.example.thymeleaf.service.WooniuSynIdService;
 import com.example.thymeleaf.util.SqlHelper;
 import jodd.http.HttpRequest;
@@ -40,6 +41,9 @@ public class WooniuSynCroner {
 
     @Autowired
     private ArticleService articleService;
+
+    @Autowired
+    private NearTextService nearTextService;
 
     public void work(){
         logger.info("WooniuSynCroner start");
@@ -118,6 +122,8 @@ public class WooniuSynCroner {
             if(CollectionUtils.isEmpty(lst)){
                 logger.info("update to be complete");
                 wooniuSynIdService.updateComplete(toBeSyn);
+                logger.info("add near service task");
+                nearTextService.genAndReplace(articleId);
             }else{
                 for(Chapter chapter:lst){
                     logger.info("syn seq_id:"+chapter.getSeqId());
