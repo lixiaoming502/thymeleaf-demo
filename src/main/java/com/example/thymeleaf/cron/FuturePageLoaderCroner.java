@@ -106,6 +106,15 @@ public class FuturePageLoaderCroner {
                 }
             }
             final byte[] bytes = response.bodyBytes();
+
+            //实际读取的时候，有可能读不完整
+            String length = response.contentLength();
+            int requireLen = Integer.parseInt(length);
+            int actLen = bytes.length;
+            if(requireLen!=actLen){
+                throw new Exception("requireLen!=actLen");
+            }
+
             String body ;
             if(bytes!=null){
                 body = new String(bytes,charset);

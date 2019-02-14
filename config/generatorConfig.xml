@@ -47,8 +47,15 @@
         <table schema="" tableName="t_brother_chapter" domainObjectName="BrotherChapter"></table>
         <table schema="" tableName="t_schedule_task" domainObjectName="ScheduleTask"></table>
         <table schema="" tableName="t_wooniu_syn_ids" domainObjectName="WooniuSynId"></table>下次加上entity,语义更明确
-        <table schema="" tableName="t_domain_css_selector" domainObjectName="DomainCssSelector"></table>-->
-        <table schema="" tableName="t_near_text" domainObjectName="NearText"></table>
+        <table schema="" tableName="t_domain_css_selector" domainObjectName="DomainCssSelector"></table>
+        <table schema="" tableName="t_near_text" domainObjectName="NearText"></table>-->
+
+        <table tableName="t_future_crawler" modelType="flat" domainObjectName="FutureCrawler">
+            <property name="ignoreQualifiersAtRuntime" value="true"/>
+            <property name="modelOnly" value="false"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+
 
     </context>
 </generatorConfiguration>

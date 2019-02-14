@@ -1,6 +1,7 @@
 /target/
 /data
 /logs
+/stockdata
 
 ### STS ###
 .apt_generated

@@ -33,3 +33,11 @@ file not exsit->seed_id is 有效->更换seed_id->更新article_url
 BUG:番外，序章添加不了
 
 日志给出的信息一定要足够多。
+
+
+## 增强功能
+对外提供接口，使其成为一个通用的数据采集中心。
+
+1.外部可以提交一批待抓取的url，返回每个url对应的future_crawler_id
+2.外部可以根据future_crawler_id查询爬取状态，获取爬取的内容。
+3.外部可以根据future_crawler_id清除爬取的数据
